@@ -48,6 +48,9 @@ def getrelpath(input_file):
     file_relpath = os.path.relpath(input_file)
     return file_relpath
 
+def convert(v_relpath, video_dictionary, video_filename):
+    os.system('ffmpeg -i '+v_relpath+' -c:v copy -c:a copy '+video_dictionary+'/'+video_filename.split('.')[0]+'_MP4.mp4')
+
 
 def main(video_relpath, danmu_relpath):
     #danmu_relpath = getrelpath(danmu_relpath)
@@ -67,6 +70,13 @@ def main(video_relpath, danmu_relpath):
     os.system('rm -rf ./abpcache')
     os.system('mkdir abpcache')
     video_filename = video_filename.replace('\\', '')
+    if 'mp4' not in video_filename[-5:] and 'MP4' not in video_filename[-5:] and 'Mp4' not in video_filename[-5:] and 'mP4'  not in video_filename[-5:] :
+        print('Cannot read your file, trying to convert to MP4, need ffmpeg...')
+        Process(target=convert(v_relpath, video_dictionary, video_filename), ).start()
+        print('I made a MP4 file for you, next time please use the MP4 file directly!')
+        video_relpath = video_dictionary+'/'+video_filename.split('.')[0]+'_MP4.mp4'
+        video_filename = video_filename.split('.')[0]+'_MP4.mp4'
+    print(video_relpath)
     video_filename_url = ''
     video_filename_url = urllib.quote(video_filename)
     os.system('ln -s '+ real_cache_dir+' ./abpcache ')
@@ -79,7 +89,7 @@ def main(video_relpath, danmu_relpath):
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 		<meta http-equiv="X-UA-Compatible" value="IE=9">
 		<link rel="stylesheet" href="css/base.css?1" />
-		<title>New Interface Test for ABPlayer</title>
+		<title>'''+ video_filename + ''' - ABPlayerHTML5PyMac</title>
 		<script src="mobile.js"></script>
 		<script src="CommentCore.js"></script>
 		<script src="libxml.js"></script>
