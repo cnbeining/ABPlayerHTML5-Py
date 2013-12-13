@@ -48,16 +48,13 @@ def getrelpath(input_file):
     file_relpath = os.path.relpath(input_file)
     return file_relpath
 
-def convert(v_relpath, video_dictionary, video_filename):
-    os.system('ffmpeg -i '+v_relpath+' -c:v copy -c:a copy '+video_dictionary+'/'+video_filename.split('.')[0]+'_MP4.mp4')
-
 
 def main(video_relpath, danmu_relpath):
     #danmu_relpath = getrelpath(danmu_relpath)
     #video_relpath = getrelpath(video_relpath)
     video_filename = video_relpath.split("/")[-1].strip()
     video_dictionary = os.path.dirname(v_relpath)
-    danmu_filename = danmu_relpath.split("/")[-1]
+    danmu_filename = danmu_relpath.split("/")[-1].strip()
     py_path = sys.path[0]
     os.chdir(py_path)
     user = getpass.getuser()
@@ -81,7 +78,7 @@ def main(video_relpath, danmu_relpath):
     video_filename_url = urllib.quote(video_filename)
     os.system('ln -s '+ real_cache_dir+' ./abpcache ')
     os.system('cp /'+ video_relpath+'  '+ real_cache_dir)
-    os.system('cp /'+ danmu_relpath+'  '+ real_cache_dir)
+    os.system('cp /'+ danmu_relpath+'  '+ real_cache_dir+'/comment.xml')
     os.system('mv '+real_cache_dir+'/'+danmu_filename +' '+real_cache_dir+'/webpage.html')
     html_to_write = '''<!DOCTYPE html>
 <html>
