@@ -9,6 +9,8 @@ Written in Python, based on ABPlayerHTML5, this is a quick way to enjoy commit(D
 
 Also check https://github.com/superwbd/Mukioplayer-Py-Mac  , this is the one with flash and MukioplayerPlus.
 
+Looking for downloading video and comment from Bilibili really simple and quick? Check Biligrab: http://www.cnbeining.com/?p=330   , auto download, rename, and concatenate into one file.(Thinking of pushing this to github...)
+
 Download
 ------
 I will upload every version here: https://sourceforge.net/projects/abplayerhtml5pynix/
