@@ -4,7 +4,7 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 		<meta http-equiv="X-UA-Compatible" value="IE=9">
 		<link rel="stylesheet" href="css/base.css?1" />
-		<title>New Interface Test for ABPlayer</title>
+		<title>Hatsune Miku - Alice - Vocaloid 初音ミク.mp4 - ABPlayerHTML5PyMac</title>
 		<script src="mobile.js"></script>
 		<script src="CommentCore.js"></script>
 		<script src="libxml.js"></script>
@@ -15,17 +15,6 @@
 				var inst = ABP.bind(document.getElementById("player1"), isMobile());
 				CommentLoader("comment.xml", inst.cmManager);
 				inst.txtText.focus();
-				inst.btnFull.addEventListener("click", function(){
-					var player = document.getElementById("player1");
-					player.style.position = "fixed";
-					player.style.top = "0";
-					player.style.bottom = "0";
-					player.style.left = "0";
-					player.style.right = "0";
-					player.style.width = "";
-					player.style.height= "";
-					inst.cmManager.setBounds();
-				});
 				inst.txtText.addEventListener("keydown", function(e){
 					if(e && e.keyCode === 13){
 						if(/^!/.test(this.value)) return; //Leave the internal commands
@@ -37,11 +26,11 @@
 		</script>
 	</head>
 	<body>
-		<div id="player1" class="ABP-Unit" style="width:640px;height:480px;" tabindex="1">
+		<div id="player1" class="ABP-Unit" style="width:1280px;height:720px;" tabindex="1">
 			<div class="ABP-Video">
 				<div class="ABP-Container"></div>
 				<video id="abp-video" autobuffer="true" data-setup="{}">
-					<source src="http://localhost:9447/abpcache/abplayerhtml5_py/acc_MP4.mp4" type="video/mp4">
+					<source src="http://localhost:10272/abpcache/abplayerhtml5_py/Hatsune%20Miku%20-%20Alice%20-%20Vocaloid%20%E5%88%9D%E9%9F%B3%E3%83%9F%E3%82%AF.mp4" type="video/mp4">
 					<p>Your browser does not support html5 video!</p>
 				</video>
 

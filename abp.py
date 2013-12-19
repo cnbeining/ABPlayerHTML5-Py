@@ -1,6 +1,6 @@
 # coding=utf-8
 '''
-ABPlayerHTML5_Py_Mac 2.000.06
+ABPlayerHTML5_Py_Mac 2.000.02
 Based on ABPlayerHTML5
 MIT licence
 Beining@ACICFG
@@ -97,17 +97,6 @@ def main(video_relpath, danmu_relpath):
 				var inst = ABP.bind(document.getElementById("player1"), isMobile());
 				CommentLoader("comment.xml", inst.cmManager);
 				inst.txtText.focus();
-				inst.btnFull.addEventListener("click", function(){
-					var player = document.getElementById("player1");
-					player.style.position = "fixed";
-					player.style.top = "0";
-					player.style.bottom = "0";
-					player.style.left = "0";
-					player.style.right = "0";
-					player.style.width = "";
-					player.style.height= "";
-					inst.cmManager.setBounds();
-				});
 				inst.txtText.addEventListener("keydown", function(e){
 					if(e && e.keyCode === 13){
 						if(/^!/.test(this.value)) return; //Leave the internal commands
@@ -119,7 +108,7 @@ def main(video_relpath, danmu_relpath):
 		</script>
 	</head>
 	<body>
-		<div id="player1" class="ABP-Unit" style="width:640px;height:480px;" tabindex="1">
+		<div id="player1" class="ABP-Unit" style="width:1280px;height:720px;" tabindex="1">
 			<div class="ABP-Video">
 				<div class="ABP-Container"></div>
 				<video id="abp-video" autobuffer="true" data-setup="{}">
@@ -142,7 +131,8 @@ def main(video_relpath, danmu_relpath):
 			</div>
 		</div>
 	</body>
-</html>'''
+</html>
+'''
     html_to_write = html_to_write.encode("utf8")
     os.chdir(py_path)
     f = open('./webpage.html', "w")
