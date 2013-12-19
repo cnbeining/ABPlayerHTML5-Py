@@ -66,6 +66,8 @@ This project uses MIT licence.
 Update history
 -----
 
-。02：Update as the original programme updates, willing to fix the navigation problem. Chrome is having unknown problem, and is pending review. 
+.03：Update as the original programme updates, willing to fix the navigation problem. Chrome is having unknown problem, and is pending review. 
+
+.02: Able to convert files by itself.
 
 .01: First version
