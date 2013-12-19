@@ -36,7 +36,10 @@ def http_server():
     serveraddr=('', int(port))   # http://yige.org
     srvr=ThreadingServer(serveraddr,SimpleHTTPRequestHandler)
     srvr.serve_forever()
-
+    
+def convert(v_relpath, video_dictionary, video_filename):
+    os.system('ffmpeg -i '+v_relpath+' -c:v copy -c:a copy '+video_dictionary+'/'+video_filename.split('.')[0]+'_MP4.mp4')
+ 
 
 
 
