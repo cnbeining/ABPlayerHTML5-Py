@@ -25,9 +25,9 @@ Make sure you have a web browser which can play Flash.
 
 Make sure you use Python 2.7 (this is provided along with OSX), and run ‘python abp.py’.
 
-After “Vid”, drag in the video file you would like to play. ONLY MP4 file, for this in the only thing that HTML5 support.(Built-in converter To-Do)
+After “Vid”, drag in the video file you would like to play. Since 1.02, you should can use any file with H.264 and AAC, as long as ffmpeg can convert it.
 
-For XML, drag in the XML file. Commit files from Bilibili would be OK, which had beed tested, while those from other sites are pending test. Please tell me the test result you have, this would be very helpful, and hereby I thank you in advance for your help. Enter.
+For XML, drag in the XML file. Comment files from Bilibili would be OK, which had beed tested, while those from other sites are pending test. Please tell me the test result you have, this would be very helpful, and hereby I thank you in advance for your help. If the video name and the comment filename are the same, just input " '' " in "XML", and it will get the comment by itself. Enter.
 
 For the first you run it, OSX may ask you for approving the connections. Does not matter whether you allow or not.
 
@@ -39,6 +39,8 @@ Things you should know
 -----
 Please do not include anything besides characters or numbers in your folder or filename. There ’s no guarantee that symbols would be cool.
 (Update: This should be fixed in version .05. Open an issue if it does not work.)
+
+Only Chrome or Safari will work. Firefox or Opera on *nix cannot read MP4. No why, they just can't.
 
 Make sure you use Python 2.7, 3.3 won’t work for it doesn’t have some important network modules.
 
@@ -59,12 +61,14 @@ Copyleft
 -----
 A number of opensource codes are used in this little project, especially the main programme, Mukioplayer. The website of Mukioplayer is https://code.google.com/p/mukioplayer/  ,MIT License.
 
-The part of web server is from http://yige.org  .
+The part of web server is from http://xiaket.org/  , author:Xia Kai <xiaket@corp.netease.com/xiaket@gmail.com> .
 
 This project uses MIT licence. 
 
 Update history
 -----
+
+.04: Fix Issue #1 in a way, now Chrome and Safari are both good to play with more stable backbone.
 
 .03：Update as the original programme updates, willing to fix the navigation problem. Chrome is having unknown problem, and is pending review. 
 
