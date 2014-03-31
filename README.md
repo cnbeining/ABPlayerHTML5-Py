@@ -61,7 +61,7 @@ Get in touch with me via cnbeining[at]gmail.com  .
 
 Copyleft
 -----
-A number of opensource codes are used in this little project, especially the main programme, Mukioplayer. The website of Mukioplayer is https://code.google.com/p/mukioplayer/  ,MIT License.
+A number of opensource codes are used in this little project, especially the main programme, ABPlayerHTML5. The website of ABPlayerHTML5 is https://github.com/jabbany/ABPlayerHTML5 , MIT License, used under authorization of original developer.
 
 The part of web server is from http://xiaket.org/  , author:Xia Kai <xiaket@corp.netease.com/xiaket@gmail.com> .
 
@@ -69,6 +69,8 @@ This project uses MIT licence.
 
 Update history
 -----
+.06: Update from the mainstream, merge all the updates since Dec.15.2013. Also reduce the speed of comments, thanks to @yao.ot's report and pull request #5 of ABPlayerHTML5 : https://github.com/jabbany/ABPlayerHTML5/pull/5   . Redo the Readme.
+
 .05: Fix the problem that if ~/.cache does not exist, it will return a 404. Also fix the version number problem.
 
 .04: Fix Issue #1 in a way, now Chrome and Safari are both good to play with more stable backbone.
