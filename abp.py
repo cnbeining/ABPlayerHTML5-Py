@@ -1,6 +1,6 @@
 # coding=utf-8
 '''
-ABPlayerHTML5_Py_Mac 1.04
+ABPlayerHTML5_Py_Mac 1.05
 Based on ABPlayerHTML5
 MIT licence
 Beining@ACICFG
@@ -20,6 +20,8 @@ import socket
 from random import randint
 from BaseHTTPServer import HTTPServer
 from SimpleHTTPServer import SimpleHTTPRequestHandler
+import commands
+
 
 
 def getrelpath(input_file):
@@ -164,20 +166,23 @@ def http_server():
 def convert(v_relpath, video_dictionary, video_filename):
     # check: http://www.cnbeining.com/?p=265
     os.system(
-        'ffmpeg -i ' +
+        'ffmpeg -i "' +
         v_relpath +
-        ' -c:v copy -c:a copy ' +
+        '" -c:v copy -c:a copy ' +
         video_dictionary +
-        '/' +
+        '/"' +
         video_filename.split(
             '.')[
             0] +
-        '_MP4.mp4')
+        '_MP4.mp4"')
 
 
 def main(video_relpath, danmu_relpath):
     #danmu_relpath = getrelpath(danmu_relpath)
     #video_relpath = getrelpath(video_relpath)
+    output = commands.getstatusoutput('ffmpeg --help')
+    if str(output[0]) == '32512':
+        print('FFmpeg does not exist, auto transcode is unavalable!\n To fix this, copy the ffmpeg located under my folder to /usr/bin, need root account!')
     video_filename = video_relpath.split("/")[-1].strip()
     video_dictionary = os.path.dirname(v_relpath)
     if danmu_relpath is '':
@@ -189,6 +194,10 @@ def main(video_relpath, danmu_relpath):
     user = getpass.getuser()
     user_dir = '/Users/' + user
     # print(user_dir)
+    try:
+        os.system('mkdir '+user_dir+'/.cache/')
+    except:
+        pass
     real_cache_dir = user_dir + '/.cache/abplayerhtml5_py'
     os.system('rm -rf /' + real_cache_dir)
     os.system('mkdir /' + real_cache_dir)
@@ -197,7 +206,7 @@ def main(video_relpath, danmu_relpath):
     # clean up, then do the job
     os.system('mkdir abpcache')
     video_filename = video_filename.replace('\\', '')
-    if 'mp4' not in video_filename[-5:] and 'MP4' not in video_filename[-5:] and 'Mp4' not in video_filename[-5:] and 'mP4' not in video_filename[-5:]:
+    if 'mp4' not in video_filename[-5:].lower():
         print(
             'Cannot read your file, trying to convert to MP4, need ffmpeg...')
         Process(

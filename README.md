@@ -47,6 +47,8 @@ Make sure you use Python 2.7, 3.3 won’t work for it doesn’t have some import
 This software is not made for playing anything above the folder “~”. Don’t get surprised if it gives you funny results.
 (Update: Now it should can play things regardless the original location.)
 
+If you don't have FFmpeg, copy the ffmpeg here to /usr/bin/, or the auto transcode will fail.
+
 If somehow the player failed to load, try refreshing the page, for the programme has to copy the original file first before you can visit.
 
 I am completely new to Python and programming, so do please help me to improve this, and I would appreciate it very much.
@@ -67,6 +69,7 @@ This project uses MIT licence.
 
 Update history
 -----
+.05: Fix the problem that if ~/.cache does not exist, it will return a 404. Also fix the version number problem.
 
 .04: Fix Issue #1 in a way, now Chrome and Safari are both good to play with more stable backbone.
 
