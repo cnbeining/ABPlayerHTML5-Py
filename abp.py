@@ -182,7 +182,8 @@ def main(video_relpath, danmu_relpath):
     #video_relpath = getrelpath(video_relpath)
     output = commands.getstatusoutput('ffmpeg --help')
     if str(output[0]) == '32512':
-        print('FFmpeg does not exist, auto transcode is unavalable!\n To fix this, copy the ffmpeg located under my folder to /usr/bin, need root account!')
+        print('FFmpeg does not exist! Trying to get you a binary, need root...')
+        os.system('sudo curl -o /usr/bin/ffmpeg https://raw.githubusercontent.com/superwbd/ABPlayerHTML5-Py--nix/master/ffmpeg')
     video_filename = video_relpath.split("/")[-1].strip()
     video_dictionary = os.path.dirname(v_relpath)
     if danmu_relpath is '':
