@@ -402,8 +402,8 @@ function CommentManager(stageObject){
 	this.stage = stageObject;
 	this.def = {
 		opacity:1,
-		globalScale:2,
-		scrollScale:1
+		globalScale:1,
+		scrollScale:2
 	};
 	this.timeline = [];
 	this.runline = [];
