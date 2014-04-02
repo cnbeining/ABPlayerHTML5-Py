@@ -1,6 +1,6 @@
 # coding=utf-8
 '''
-ABPlayerHTML5_Py_Mac 1.05
+ABPlayerHTML5_Py_Mac 1.06
 Based on ABPlayerHTML5
 MIT licence
 Beining@ACICFG
@@ -304,9 +304,9 @@ def main(video_relpath, danmu_relpath):
         '/abpcache/abplayerhtml5_py/webpage.html')
 
 
-v_relpath = str(input('Vid'))
+v_relpath = raw_input('Vid')
 #v_relpath = v_relpath.encode('utf-8')
-X_relpath = str(input('XML'))
+X_relpath = raw_input('XML')
 #X_relpath = X_relpath.encode('utf-8')
 
 main(v_relpath, X_relpath)

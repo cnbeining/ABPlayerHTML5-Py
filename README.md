@@ -5,7 +5,7 @@ A HTML5 solution of comment playing on *nix.
 
 This is another solution of the damn fact that Mac, one of the best OS in human history, does not have a reliable and nice video commit software.
 
-Written in Python, based on ABPlayerHTML5, this is a quick way to enjoy commit(DanMu) on Mac and *nix(To-Do) like systems.
+Written in Python, based on ABPlayerHTML5, this is a quick way to enjoy comment(DanMu) on Mac and *nix(To-Do) like systems.
 
 Also check https://github.com/superwbd/Mukioplayer-Py-Mac  , this is the one with flash and MukioplayerPlus.
 
@@ -27,7 +27,7 @@ Make sure you use Python 2.7 (this is provided along with OSX), and run ‘pytho
 
 After “Vid”, drag in the video file you would like to play. Since 1.02, you should can use any file with H.264 and AAC, as long as ffmpeg can convert it.
 
-For XML, drag in the XML file. Comment files from Bilibili would be OK, which had beed tested, while those from other sites are pending test. Please tell me the test result you have, this would be very helpful, and hereby I thank you in advance for your help. If the video name and the comment filename are the same, just input " '' " in "XML", and it will get the comment by itself. Enter.
+For XML, drag in the XML file. Comment files from Bilibili would be OK, which had beed tested, while those from other sites are pending test. Please tell me the test result you have, this would be very helpful, and hereby I thank you in advance for your help. If the video name and the comment filename are the same, just press ENTER, and it will get the comment by itself. Enter.
 
 For the first you run it, OSX may ask you for approving the connections. Does not matter whether you allow or not.
 
@@ -38,7 +38,7 @@ After you use it, BE SURE to input Ctrl+C in the bash window! Though I have made
 Things you should know
 -----
 Please do not include anything besides characters or numbers in your folder or filename. There ’s no guarantee that symbols would be cool.
-(Update: This should be fixed in version .05. Open an issue if it does not work.)
+However, since the ways that video and danmaku files are called are different between Mukioplayer-Py-Mac and this programme, some file/folder name that would work there may fail here.
 
 Only Chrome or Safari will work. Firefox or Opera on *nix cannot read MP4. No why, they just can't.
 
@@ -69,6 +69,8 @@ This project uses MIT licence.
 
 Update history
 -----
+.07: Use raw_input, now you do not need to input " ' "_ before files.
+
 .06: Update from the mainstream, merge all the updates since Dec.15.2013. Also reduce the speed of comments, thanks to @yao.ot's report and pull request #5 of ABPlayerHTML5 : https://github.com/jabbany/ABPlayerHTML5/pull/5   . Redo the Readme.
 
 .05: Fix the problem that if ~/.cache does not exist, it will return a 404. Also fix the version number problem.
