@@ -69,6 +69,8 @@ This project uses MIT licence.
 
 Update history
 -----
+.07.1: Merge the upstream update by 15:30 EDT, Apr.27.2014. Stop distributing ffmpeg binary with this programme.
+
 .07: Use raw_input, now you do not need to input " ' "_ before files.
 
 .06: Update from the mainstream, merge all the updates since Dec.15.2013. Also reduce the speed of comments, thanks to @yao.ot's report and pull request #5 of ABPlayerHTML5 : https://github.com/jabbany/ABPlayerHTML5/pull/5   . Redo the Readme.

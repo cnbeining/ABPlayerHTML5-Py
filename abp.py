@@ -1,6 +1,6 @@
 # coding=utf-8
 '''
-ABPlayerHTML5_Py_Mac 1.06
+ABPlayerHTML5_Py_Mac 1.07.1
 Based on ABPlayerHTML5
 MIT licence
 Beining@ACICFG
