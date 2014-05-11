@@ -337,7 +337,7 @@ var ABP = {
 						ABPInst.cmManager.def.scrollScale = playerUnit.offsetWidth / ABPInst.defaults.w;
 					}
 				}else{
-					ABPInst.cmManager.def.scrollScale = 3;
+					ABPInst.cmManager.def.scrollScale = 5;
 				}
 			});
 			ABPInst.btnDm.addEventListener("click", function(){

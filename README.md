@@ -53,6 +53,8 @@ If somehow the player failed to load, try refreshing the page, for the programme
 
 I am completely new to Python and programming, so do please help me to improve this, and I would appreciate it very much.
 
+Looking for quick way to download videos and comments from Bilibili under OSX? Try this:http://www.cnbeining.com/?s=Biligrab
+
 About me
 -----
 Beining, CDC of ACI-CFG, 1st year CS student of UT.
@@ -69,6 +71,8 @@ This project uses MIT licence.
 
 Update history
 -----
+.07.2:  Merge the upstream update by 01:17 EDT, May.11.2014. Change the scale of comment speed. Change the font in CSS file for better look under OSX.
+
 .07.1: Merge the upstream update by 15:30 EDT, Apr.27.2014. Stop distributing ffmpeg binary with this programme.
 
 .07: Use raw_input, now you do not need to input " ' "_ before files.
