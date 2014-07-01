@@ -57,9 +57,9 @@ Looking for quick way to download videos and comments from Bilibili under OSX? T
 
 About me
 -----
-Beining, CDC of ACI-CFG, 1st year CS student of UT.
+Beining, CDC of ACI-CFG, CS student of UToronto.
 
-Get in touch with me via cnbeining[at]gmail.com  .
+Get in touch with me via cnbeining[at]gmail.com  , or at http://www.cnbeining.com
 
 Copyleft
 -----
@@ -71,6 +71,9 @@ This project uses MIT licence.
 
 Update history
 -----
+.07.3:  Merge the upstream update by 02:12 EDT, Jul.1.2014. Change the scale of comment speed. 
+		JSON files are currently NOT supported.
+
 .07.2:  Merge the upstream update by 01:17 EDT, May.11.2014. Change the scale of comment speed. Change the font in CSS file for better look under OSX.
 
 .07.1: Merge the upstream update by 15:30 EDT, Apr.27.2014. Stop distributing ffmpeg binary with this programme.
