@@ -1,6 +1,6 @@
 # coding=utf-8
 '''
-ABPlayerHTML5_Py_Mac 1.07.2
+ABPlayerHTML5_Py_Mac 1.08
 Based on ABPlayerHTML5
 MIT licence
 Beining@ACICFG
@@ -186,9 +186,27 @@ def main(video_relpath, danmu_relpath):
         os.system('sudo curl -o /usr/bin/ffmpeg https://raw.githubusercontent.com/superwbd/ABPlayerHTML5-Py--nix/master/ffmpeg')
     video_filename = video_relpath.split("/")[-1].strip()
     video_dictionary = os.path.dirname(v_relpath)
+    danmaku_type = ''
     if danmu_relpath is '':
-        danmu_relpath = video_relpath.split('.')[:-1][0] + '.xml'
-    # detect the comment file by itself
+        #Add here for now.
+        danmu_relpath_xml = str(video_relpath.split('.')[:-1][0] + '.xml')
+        danmu_relpath_json = video_relpath.split('.')[:-1][0] + '.json'
+        if os.path.isfile(danmu_relpath_xml.replace('\\', '')):
+            danmu_relpath = danmu_relpath_xml
+            danmaku_type = 'b'
+        elif os.path.isfile(danmu_relpath_json.replace('\\', '')):
+            danmu_relpath = danmu_relpath_json
+            danmaku_type = 'a'
+        else:
+            danmu_relpath = raw_input('Cannot find file, please drag in the danmaku file!')
+            if video_relpath.split('.')[-1].lower() is 'xml':
+                danmaku_type = 'b'
+            elif video_relpath.split('.')[-1].lower() is 'json':
+                danmaku_type = 'a'
+            else:
+                print('Cannot read danmaku!')
+                exit()
+        # detect the comment file by itself
     danmu_filename = danmu_relpath.split("/")[-1].strip()
     py_path = sys.path[0]
     os.chdir(py_path)
@@ -227,7 +245,10 @@ def main(video_relpath, danmu_relpath):
     video_filename_url = urllib.quote(video_filename)
     os.system('ln -s ' + real_cache_dir + ' ./abpcache ')
     os.system('cp /' + video_relpath + '  ' + real_cache_dir)
-    os.system('cp /' + danmu_relpath + '  ' + real_cache_dir + '/comment.xml')
+    if danmaku_type is 'b':
+        os.system('cp /' + danmu_relpath + '  ' + real_cache_dir + '/comment.xml')
+    elif danmaku_type is 'a':
+        os.system('cp /' + danmu_relpath + '  ' + real_cache_dir + '/comment.json')
     # in case someone use funny filename in their file...
     os.system(
         'mv ' +
@@ -245,7 +266,7 @@ def main(video_relpath, danmu_relpath):
 		<link rel="stylesheet" href="css/base.css?1" />
 		<title>''' + video_filename + ''' - ABPlayerHTML5PyMac</title>
 		<script src="mobile.js"></script>
-		<script src="CommentCore.js"></script>
+		<script src="CommentCoreLibrary.js"></script>
 		<script src="libxml.js"></script>
 		<script src="Parsers.js"></script>
 		<script src="player.js"></script>
@@ -262,20 +283,39 @@ def main(video_relpath, danmu_relpath):
 				});
 				window.abpinst = inst;
 			});
+		
+function launchFullscreen(element) {
+  if(element.requestFullscreen) {
+    element.requestFullscreen();
+  } else if(element.mozRequestFullScreen) {
+    element.mozRequestFullScreen();
+  } else if(element.webkitRequestFullscreen) {
+    element.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
+  } else if(element.msRequestFullscreen) {
+    element.msRequestFullscreen();
+  }
+}
+
+function exitFullscreen() {
+  if(document.exitFullscreen) {
+    document.exitFullscreen();
+  } else if(document.mozCancelFullScreen) {
+    document.mozCancelFullScreen();
+  } else if(document.webkitExitFullscreen) {
+    document.webkitExitFullscreen();
+  }
+}		
+		
 		</script>
 	</head>
 	<body>
-		<div id="player1" class="ABP-Unit" style="width:1440px;height:900px;" tabindex="1">
+		<div id="player1" class="ABP-Unit ABP-FullScreen" style="width:1440px;height:900px;" tabindex="1">
 			<div class="ABP-Video">
 				<div class="ABP-Container"></div>
 				<video id="abp-video" autobuffer="true" data-setup="{}">
 					<source src="http://localhost:''' + port + '''/abpcache/abplayerhtml5_py/''' + video_filename_url + '''" type="video/mp4">
 					<p>Your browser does not support html5 video!</p>
 				</video>
-
-			</div>
-			<div class="ABP-Text">
-				<input type="text">
 			</div>
 			<div class="ABP-Control">
 				<div class="button ABP-Play"></div>
@@ -302,7 +342,31 @@ def main(video_relpath, danmu_relpath):
         'http://localhost:' +
         port +
         '/abpcache/abplayerhtml5_py/webpage.html')
-
+#.get('safari')
+'''Edit here to use your prefered browser!
+    'mozilla' Mozilla('mozilla')   
+    'firefox' Mozilla('mozilla')   
+    'netscape' Mozilla('netscape')   
+    'galeon' Galeon('galeon')   
+    'epiphany' Galeon('epiphany')   
+    'skipstone' BackgroundBrowser('skipstone')   
+    'kfmclient' Konqueror() (1) 
+    'konqueror' Konqueror() (1) 
+    'kfm' Konqueror() (1) 
+    'mosaic' BackgroundBrowser('mosaic')   
+    'opera' Opera()   
+    'grail' Grail()   
+    'links' GenericBrowser('links')   
+    'elinks' Elinks('elinks')   
+    'lynx' GenericBrowser('lynx')   
+    'w3m' GenericBrowser('w3m')   
+    'windows-default' WindowsDefault (2) 
+    'macosx' MacOSX('default') (3) 
+    'safari' MacOSX('safari') (3) 
+    'google-chrome' Chrome('google-chrome')   
+    'chrome' Chrome('chrome')   
+    'chromium' Chromium('chromium')   
+    'chromium-browser' Chromium('chromium-browser')'''
 
 v_relpath = raw_input('Vid')
 #v_relpath = v_relpath.encode('utf-8')

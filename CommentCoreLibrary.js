@@ -1,56 +1,3 @@
-/** This is the element for the comment **/
-function CCLComment(data, motion, parent){
-	/** Parent designates the comment's type **/
-	this.render = parent ? "DOM" : "CANVAS";
-	this.mode = data.mode;
-	this.parent = parent;
-	this.data = data;
-	//Motion is a motion factory or the manager
-	this.motion = motion;
-
-	this.width = -1;
-	this.height = -1;
-	this.x = 0;
-	this.y = 0;
-}
-
-CCLComment.prototype.set = function(styleParam, value){
-	switch(styleParam){
-		case "top":
-		case "left":
-		case "right":
-		case "bottom":{
-			this.parent.style[styleParam] = value ? (value + "px") : "";
-		}break;
-	}
-}
-
-CCLComment.prototype.getTTL = function(){
-	return this.motion ? this.motion.ttl : this.data.dur;
-}
-
-CCLComment.prototype.getBounds = function(){
-	this.width = this.parent.offsetWidth;
-	this.height = this.parent.offsetHeight;
-	this.x = this.parent.offsetLeft;
-	this.y = this.parent.offsetTop;
-	this.top = this.y;
-	this.bottom = this.y + this.height;
-	this.left = this.x;
-	this.right = this.x + this.width;
-};
-
-CCLComment.prototype.setMotion = function(m){
-	this.motion = m;
-}
-
-CCLComment.prototype.destroy = function(){
-	//Destroys references to aid gc?
-	delete this.parent;
-	delete this.motion;
-	this.render = "NONE";
-	this.type = -1;
-}
 /** 
 Comment Filters/Filter Lang
 Licensed Under MIT License
@@ -66,6 +13,7 @@ function CommentFilter(){
 		"5":true,
 		"6":true,
 		"7":true,
+		"8":true,
 		"17":true
 	};
 	this.doModify = function(cmt){
@@ -118,7 +66,7 @@ function CommentFilter(){
 		if(!this.allowTypes[cmtData.mode])
 			return false;
 		/** Create abstract cmt data **/
-		abstCmtData = {
+		var abstCmtData = {
 			text:cmtData.text,
 			mode:cmtData.mode,
 			color:cmtData.color,
@@ -166,24 +114,27 @@ function CommentFilter(){
 	this.setRuntimeFilter = function(f){
 		this.runtime = f;
 	}
-}/** 
+}
+
+/** 
 Comment Space Allocators Classes
 Licensed Under MIT License
 You may create your own.
 **/
-function CommentSpaceAllocator(w, h){
+function CommentSpaceAllocator(w,h){
 	this.width = w;
 	this.height = h;
+	this.dur = 4000;
 	this.pools = [[]];
 	this.pool = this.pools[0];
 	this.setBounds = function(w,h){this.width = w;this.height = h;};
 	this.add = function(cmt){
 		if(cmt.height >= this.height){
 			cmt.cindex = this.pools.indexOf(this.pool);
-			cmt.set("top",0);
+			cmt.style.top = "0px";
 		}else{
 			cmt.cindex = this.pools.indexOf(this.pool);
-			cmt.set("top",this.setY(cmt));
+			cmt.style.top = this.setY(cmt) + "px";
 		}
 	};
 	this.remove = function(cmt){
@@ -191,7 +142,16 @@ function CommentSpaceAllocator(w, h){
 		tpool.remove(cmt);
 	};
 	this.validateCmt = function(cmt){
-		cmt.getBounds();
+		cmt.bottom = cmt.offsetTop + cmt.offsetHeight;
+		cmt.y = cmt.offsetTop;
+		cmt.x = cmt.offsetLeft;
+		cmt.right = cmt.offsetLeft + cmt.offsetWidth;
+		if(!cmt.width || !cmt.height){
+			cmt.height = cmt.offsetHeight;
+			cmt.width = cmt.offsetWidth;
+		}
+		cmt.top = cmt.offsetTop;
+		cmt.left = cmt.offsetLeft;
 		return cmt;
 	};
 	this.setY = function(cmt,index){
@@ -233,7 +193,7 @@ function CommentSpaceAllocator(w, h){
 				return cmt.y;
 			}
 		}
-		this.setY(cmt,index+1);
+		return this.setY(cmt,index+1);
 	};
 	this.vCheck = function(y,cmt){
 		var bottom = y + cmt.height;
@@ -256,23 +216,23 @@ function CommentSpaceAllocator(w, h){
 		return true;
 	};
 	this.getEnd  = function(cmt){
-		return cmt.data.stime + cmt.getTTL();
+		return cmt.stime + cmt.ttl;
 	};
 	this.getMiddle = function(cmt){
-		return cmt.data.stime + (cmt.getTTL() / 2);
+		return cmt.stime + (cmt.ttl / 2);
 	};
 }
 function TopCommentSpaceAllocator(w,h){
 	var csa = new CommentSpaceAllocator(w,h);
 	csa.add = function (cmt){
 		csa.validateCmt(cmt);
-		cmt.set("left", (csa.width - cmt.width)/2);
+		cmt.style.left = (csa.width - cmt.width)/2 + "px";
 		if(cmt.height >= csa.height){
 			cmt.cindex = csa.pools.indexOf(csa.pool);
-			cmt.set("top", 0);
+			cmt.style.top = "0px";
 		}else{
 			cmt.cindex = csa.pools.indexOf(csa.pool);
-			cmt.set("top", csa.setY(cmt));
+			cmt.style.top = csa.setY(cmt) + "px";
 		}
 	};
 	csa.vCheck = function(y,cmt){
@@ -296,21 +256,20 @@ function TopCommentSpaceAllocator(w,h){
 function BottomCommentSpaceAllocator(w,h){
 	var csa = new CommentSpaceAllocator(w,h);
 	csa.add = function (cmt){
-		cmt.set("top", null);
-		cmt.set("bottom", 0);
+		cmt.style.top = "";
+		cmt.style.bottom = "0px";
 		csa.validateCmt(cmt);
-		cmt.set("left",(csa.width - cmt.width)/2);
+		cmt.style.left = (csa.width - cmt.width)/2 + "px";
 		if(cmt.height >= csa.height){
 			cmt.cindex = csa.pools.indexOf(csa.pool);
-			cmt.set("bottom",0);
+			cmt.style.bottom = "0px";
 		}else{
 			cmt.cindex = csa.pools.indexOf(csa.pool);
-			cmt.set("bottom", csa.setY(cmt));
+			cmt.style.bottom = csa.setY(cmt) + "px";
 		}
 	};
 	csa.validateCmt = function(cmt){
-		cmt.getBounds();
-		cmt.y = csa.height - (cmt.parent.offsetTop + cmt.parent.offsetHeight);
+		cmt.y = csa.height - (cmt.offsetTop + cmt.offsetHeight);
 		cmt.bottom = cmt.y + cmt.offsetHeight;
 		cmt.x = cmt.offsetLeft;
 		cmt.right = cmt.offsetLeft + cmt.offsetWidth;
@@ -400,15 +359,6 @@ function BottomScrollCommentSpaceAllocator(w,h){
 * Author : Jim Chen
 * Licensing : MIT License
 ******/
-$ = function(a){return document.getElementById(a);};
-var ABGlobal = {
-	is_webkit:function(){
-		try{
-			if(/webkit/.test( navigator.userAgent.toLowerCase())) return true;
-		}catch(e){return false;}
-		return false;
-	}
-};
 Array.prototype.remove = function(obj){
 	for(var a = 0; a < this.length;a++)
 		if(this[a] == obj){
@@ -444,17 +394,15 @@ Array.prototype.binsert = function(what,how){
 };
 /****** Load Core Engine Classes ******/
 function CommentManager(stageObject){
-	if(!CCLAnim || CCLAnim.v < 0.9)
-		throw "Animation Library Not Supported!"
-	var lastpos = 0;
+	var __timer = 0;
 	this.stage = stageObject;
 	this.def = {
 		opacity:1,
-		globalScale:2,
-		scrollScale:1
+		globalScale:1,
+		scrollScale:3
 	};
 	this.timeline = [];
-	this.runline = CCLAnim.createAnimateContext();
+	this.runline = [];
 	this.position = 0;
 	this.limiter = 0;
 	this.filter = null;
@@ -465,86 +413,60 @@ function CommentManager(stageObject){
 		reverse:new ReverseCommentSpaceAllocator(0,0),
 		scrollbtm:new BottomScrollCommentSpaceAllocator(0,0)
 	};
+	/** Precompute the offset width **/
+	this.stage.width = this.stage.offsetWidth;
+	this.stage.height= this.stage.offsetHeight;
 	/** Private **/
-	this.initCommentDOM = function(domObject, data){
-		domObject.className = 'cmt';
-		if(ABGlobal.is_webkit() && data.mode < 7) domObject.className+=" webkit-helper";
-		if(data.mode == 17){
+	this.initCmt = function(cmt,data){
+		cmt.className = 'cmt';
+		cmt.stime = data.stime;
+		cmt.mode = data.mode;
+		cmt.data = data;
+		if(cmt.mode === 17){
 			
 		}else{
-			domObject.appendChild(document.createTextNode(data.text));
-			domObject.innerText = data.text;
-			domObject.style.fontSize = data.size + "px";
+			cmt.appendChild(document.createTextNode(data.text));
+			cmt.innerText = data.text;
+			cmt.style.fontSize = data.size + "px";
 		}
 		if(data.font != null && data.font != '')
-			domObject.style.fontFamily = data.font;
-		if(data.shadow == false && data.shadow != null)
-			domObject.className = 'cmt noshadow';
-		if(data.color == "#000000")
-			domObject.className += ' rshadow';
+			cmt.style.fontFamily = data.font;
+		if(data.shadow === false)
+			cmt.className = 'cmt noshadow';
+		if(data.color == "#000000" && (data.shadow || data.shadow == null))
+			cmt.className += ' rshadow';
+		if(data.margin != null)
+			cmt.style.margin = data.margin;
 		if(data.color != null)
-			domObject.style.color = data.color;
+			cmt.style.color = data.color;
 		if(this.def.opacity != 1 && data.mode == 1)
-			domObject.style.opacity = this.def.opacity;
+			cmt.style.opacity = this.def.opacity;
 		if(data.alphaFrom != null)
-			domObject.style.opacity = data.alphaFrom;
-		return domObject;
-	};
-	
-	this.initCommentMovement = function(cmtObj){
-		var move = null;
-		var stg = this.stage;
-		var cmMgr = this;
-		switch(cmtObj.data.mode){
-			default:
-			case 1:
-			case 2:{
-				//console.log(cmtObj);
-				move = new CCLAnim.Translate({
-					"from":{
-						"x":stg.offsetWidth,
-						"y":cmtObj.parent.offsetTop
-					},
-					"to":{
-						"x":0 - cmtObj.width,
-						"y":cmtObj.parent.offsetTop
-					},
-					"dur": cmtObj.data.dur
-				}, cmtObj.parent, function(){
-					stg.removeChild(cmtObj.parent);
-					cmMgr.finish(cmtObj);
-					cmtObj.destroy();
-					
-				});
-			}break;
-			case 4:
-			case 5:{
-				move = new CCLAnim.Animation();
-				if(cmtObj.data.dur){
-					move.dur = cmtObj.data.dur;
-					move.ttl = cmtObj.data.dur;
-				}
-				move.addEventListener("end", function(){
-					stg.removeChild(cmtObj.parent);
-					cmMgr.finish(cmtObj);
-					cmtObj.destroy();
-				});
-			}break;
+			cmt.style.opacity = data.alphaFrom;
+		if(data.border)
+			cmt.style.border = "1px solid #00ffff";
+		cmt.ttl = Math.round(4000 * this.def.globalScale);
+		cmt.dur = cmt.ttl;
+		if(cmt.mode === 1 || cmt.mode === 6 || cmt.mode === 2){
+			cmt.ttl *= this.def.scrollScale;
+			cmt.dur = cmt.ttl;
 		}
-		if(move == null){
-			console.log("Create Motion Failed");
-			return null;
-		}
-		cmtObj.motion = move;
-		cmtObj.setMotion(move);
-		return cmtObj;
+		return cmt;
 	};
-	
 	this.startTimer = function(){
-		this.runline.start();
+		if(__timer > 0)
+			return;
+		var lastTPos = new Date().getTime();
+		var cmMgr = this;
+		__timer = window.setInterval(function(){
+			var elapsed = new Date().getTime() - lastTPos;
+			lastTPos = new Date().getTime();
+			cmMgr.onTimerEvent(elapsed,cmMgr);
+		},10);
 	};
 	this.stopTimer = function(){
-		this.runline.pause();
+		window.clearInterval(__timer);
+		__timer = 0;
 	};
 }
 	
@@ -579,12 +501,21 @@ CommentManager.prototype.load = function(a){
 	});
 };
 CommentManager.prototype.clear = function(){
-	//this.runline.clear();
+	for(var i=0;i<this.runline.length;i++){
+		this.finish(this.runline[i]);
+		this.stage.removeChild(this.runline[i]);
+	}
+	this.runline = [];
 };
 CommentManager.prototype.setBounds = function(){
 	for(var comAlloc in this.csa){
 		this.csa[comAlloc].setBounds(this.stage.offsetWidth,this.stage.offsetHeight);
 	}
+	this.stage.width = this.stage.offsetWidth;
+	this.stage.height= this.stage.offsetHeight;
+	// Update 3d perspective
+	this.stage.style.perspective = this.stage.width * Math.tan(40 * Math.PI/180) / 2 + "px";
+	this.stage.style.webkitPerspective = this.stage.width * Math.tan(40 * Math.PI/180) / 2 + "px";
 };
 CommentManager.prototype.init = function(){
 	this.setBounds();
@@ -598,35 +529,45 @@ CommentManager.prototype.time = function(time){
 		this.lastPos = time;
 		if(this.timeline.length <= this.position)
 			return;
-	}else this.lastPos = time;
+	}else{
+		this.lastPos = time;
+	}
 	for(;this.position < this.timeline.length;this.position++){
-		if(this.validate(this.timeline[this.position]) && this.timeline[this.position]['stime']<=time) this.sendComment(this.timeline[this.position]);
-		else break;
+		if(this.limiter > 0 && this.runline.length > this.limiter) break;
+		if(this.validate(this.timeline[this.position]) && this.timeline[this.position]['stime']<=time){
+			this.sendComment(this.timeline[this.position]);
+		}else{
+			break;
+		}
 	}
 };
 CommentManager.prototype.rescale = function(){
-	return;
 	for(var i = 0; i < this.runline.length; i++){
 		this.runline[i].dur = Math.round(this.runline[i].dur * this.def.globalScale);
 		this.runline[i].ttl = Math.round(this.runline[i].ttl * this.def.globalScale);
 	}
 };
 CommentManager.prototype.sendComment = function(data){
-	// Setup the comment abstract representation
-	var dom = document.createElement('div');
-	var cmt = new CCLComment(data, null, dom);
-	// Initialize it in the dom
-	this.initCommentDOM(dom, data);
+	if(data.mode === 8){
+		console.log(data);
+		if(this.scripting){
+			console.log(this.scripting.eval(data.code));
+		}
+		return;
+	}
+	var cmt = document.createElement('div');
+	if(this.filter != null){
+		data = this.filter.doModify(data);
+		if(data == null) return;
+	}
+	cmt = this.initCmt(cmt,data);
 	
-	this.stage.appendChild(cmt.parent);
-	
-	cmt.getBounds();
-	// Fix the comment size
-	cmt.parent.style.width = (cmt.width + 1) + "px";
-	cmt.parent.style.height = (cmt.height - 3) + "px";
-	cmt.parent.style.left = this.stage.offsetWidth + "px";
-	
-	
+	this.stage.appendChild(cmt);
+	cmt.width = cmt.offsetWidth;
+	cmt.height = cmt.offsetHeight;
+	//cmt.style.width = (cmt.width + 1) + "px";
+	//cmt.style.height = (cmt.height - 3) + "px";
+	cmt.style.left = this.stage.width + "px";
 	
 	if(this.filter != null && !this.filter.beforeSend(cmt)){
 		this.stage.removeChild(cmt);
@@ -642,34 +583,55 @@ CommentManager.prototype.sendComment = function(data){
 		case 6:{this.csa.reverse.add(cmt);}break;
 		case 17:
 		case 7:{
-			return;
-			cmt.style.top = data.y + "px";
-			cmt.style.left = data.x + "px";
+			if(cmt.data.position !== "relative"){
+				cmt.style.top = cmt.data.y + "px";
+				cmt.style.left = cmt.data.x + "px";
+			}else{
+				cmt.style.top = cmt.data.y * this.stage.height + "px";
+				cmt.style.left = cmt.data.x * this.stage.width + "px";
+			}
 			cmt.ttl = Math.round(data.duration * this.def.globalScale);
 			cmt.dur = Math.round(data.duration * this.def.globalScale);
-			if(data.rY!=0 || data.rZ!=0){
+			if(data.rY !== 0 || data.rZ !== 0){
 				/** TODO: revise when browser manufacturers make up their mind on Transform APIs **/
+				var getRotMatrix = function(yrot, zrot) {
+					// Courtesy of @StarBrilliant, re-adapted to look better
+					var DEG2RAD = Math.PI/180;
+					var yr = yrot * DEG2RAD;
+					var zr = zrot * DEG2RAD;
+					var COS = Math.cos;
+					var SIN = Math.sin;
+					var matrix = [
+						COS(yr) * COS(zr)    , COS(yr) * SIN(zr)     , SIN(yr)  , 0, 
+						(-SIN(zr))           , COS(zr)               , 0        , 0, 
+						(-SIN(yr) * COS(zr)) , (-SIN(yr) * SIN(zr))  , COS(yr)  , 0,
+						0                    , 0                     , 0        , 1
+					];
+					// CSS does not recognize scientific notation (e.g. 1e-6), truncating it.
+					for(var i = 0; i < matrix.length;i++){
+						if(Math.abs(matrix[i]) < 0.000001){
+							matrix[i] = 0;
+						}
+					}
+					return "matrix3d(" + matrix.join(",") + ")";
+				}
 				cmt.style.transformOrigin = "0% 0%";
 				cmt.style.webkitTransformOrigin = "0% 0%";
 				cmt.style.OTransformOrigin = "0% 0%";
 				cmt.style.MozTransformOrigin = "0% 0%";
 				cmt.style.MSTransformOrigin = "0% 0%";
-				cmt.style.transform = "rotateY(" + (data.rY > 180 && data.rY < 270?(0-data.rY):data.rY) + "deg) rotateZ(" + (data.rZ > 180 && data.rZ < 270?(0-data.rZ):data.rZ) + "deg)";
-				cmt.style.webkitTransform = "rotateY(" + (data.rY > 180 && data.rY < 270?(0-data.rY):data.rY) + "deg) rotateZ(" + (data.rZ > 180 && data.rZ < 270?(0-data.rZ):data.rZ) + "deg)";
-				cmt.style.OTransform = "rotateY(" + (data.rY > 180 && data.rY < 270?(0-data.rY):data.rY)  + "deg) rotateZ(" + (data.rZ > 180 && data.rZ < 270?(0-data.rZ):data.rZ) + "deg)";
-				cmt.style.MozTransform = "rotateY(" + (data.rY > 180 && data.rY < 270?(0-data.rY):data.rY)  + "deg) rotateZ(" + (data.rZ > 180 && data.rZ < 270?(0-data.rZ):data.rZ) + "deg)";
-				cmt.style.MSTransform = "rotateY(" + (data.rY > 180 && data.rY < 270?(0-data.rY):data.rY)  + "deg) rotateZ(" + (data.rZ > 180 && data.rZ < 270?(0-data.rZ):data.rZ) + "deg)";
+				cmt.style.transform = getRotMatrix(data.rY, data.rZ);
+				cmt.style.webkitTransform = getRotMatrix(data.rY, data.rZ);
+				cmt.style.OTransform = getRotMatrix(data.rY, data.rZ);
+				cmt.style.MozTransform = getRotMatrix(data.rY, data.rZ);
+				cmt.style.MSTransform = getRotMatrix(data.rY, data.rZ);
 			}
 		}break;
 	}
-	if(data.border) cmt.style.border = "1px solid #00ffff";
-	// Make ght movement
-	this.initCommentMovement(cmt);
-	this.runline.add(cmt.motion);
+	this.runline.push(cmt);
 };
 CommentManager.prototype.finish = function(cmt){
-	console.log("Finished " + cmt.data.text);
-	switch(cmt.data.mode){
+	switch(cmt.mode){
 		default:
 		case 1:{this.csa.scroll.remove(cmt);}break;
 		case 2:{this.csa.scrollbtm.remove(cmt);}break;
@@ -681,20 +643,33 @@ CommentManager.prototype.finish = function(cmt){
 };
 /** Static Functions **/
 CommentManager.prototype.onTimerEvent = function(timePassed,cmObj){
-	for(var i=0;i<cmObj.runline.length;i++){
+	for(var i= 0;i < cmObj.runline.length; i++){
 		var cmt = cmObj.runline[i];
+		if(cmt.hold){
+			continue;
+		}
 		cmt.ttl -= timePassed;
-		if(cmt.mode == 1 || cmt.mode == 2) cmt.style.left = (cmt.ttl / cmt.dur) * (cmObj.stage.offsetWidth + cmt.offsetWidth) - cmt.offsetWidth + "px";
-		else if(cmt.mode == 6) cmt.style.left = (1 - cmt.ttl / cmt.dur) * (cmObj.stage.offsetWidth + cmt.offsetWidth) - cmt.offsetWidth + "px";
-		else if(cmt.mode == 4 || cmt.mode == 5 || cmt.mode >= 7){
+		if(cmt.mode == 1 || cmt.mode == 2) {
+			cmt.style.left = (cmt.ttl / cmt.dur) * (cmObj.stage.width + cmt.width) - cmt.width + "px";
+		}else if(cmt.mode == 6) {
+			cmt.style.left = (1 - cmt.ttl / cmt.dur) * (cmObj.stage.width + cmt.width) - cmt.width + "px";
+		}else if(cmt.mode == 4 || cmt.mode == 5 || cmt.mode >= 7){
 			if(cmt.dur == null)
 				cmt.dur = 4000;
 			if(cmt.data.alphaFrom != null && cmt.data.alphaTo != null){
-				cmt.style.opacity = (cmt.data.alphaFrom - cmt.data.alphaTo) * (cmt.ttl/cmt.dur) + cmt.data.alphaTo;
+				cmt.style.opacity = (cmt.data.alphaFrom - cmt.data.alphaTo) * 
+					(cmt.ttl/cmt.dur) + cmt.data.alphaTo;
 			}
 			if(cmt.mode == 7 && cmt.data.movable){
-				cmt.style.top = ((cmt.data.toY - cmt.data.y) * (Math.min(Math.max(cmt.dur - cmt.data.moveDelay - cmt.ttl,0),cmt.data.moveDuration) / cmt.data.moveDuration) + parseInt(cmt.data.y)) + "px";
-				cmt.style.left = ((cmt.data.toX - cmt.data.x) * (Math.min(Math.max(cmt.dur - cmt.data.moveDelay - cmt.ttl,0),cmt.data.moveDuration) / cmt.data.moveDuration) + parseInt(cmt.data.x)) + "px";
+				var posT = Math.min(Math.max(cmt.dur - cmt.data.moveDelay - cmt.ttl,0),
+					cmt.data.moveDuration) / cmt.data.moveDuration;
+				if(cmt.data.position !== "relative"){
+					cmt.style.top = ((cmt.data.toY - cmt.data.y) * posT + cmt.data.y) + "px";
+					cmt.style.left= ((cmt.data.toX - cmt.data.x) * posT + cmt.data.x) + "px";
+				}else{
+					cmt.style.top = (((cmt.data.toY - cmt.data.y) * posT + cmt.data.y) * cmObj.stage.height) + "px";
+					cmt.style.left= (((cmt.data.toX - cmt.data.x) * posT + cmt.data.x) * cmObj.stage.width) + "px";
+				}
 			}
 		}
 		if(cmObj.filter != null){
@@ -702,7 +677,216 @@ CommentManager.prototype.onTimerEvent = function(timePassed,cmObj){
 		}
 		if(cmt.ttl <= 0){
 			cmObj.stage.removeChild(cmt);
+			cmObj.runline.splice(i,1);//remove the comment
 			cmObj.finish(cmt);
 		}
 	}
 };
+
+/** 
+AcFun Format
+Licensed Under MIT License
+ An alternative format comment parser
+**/
+function AcfunParser(jsond){
+	function fillRGB(string){
+		while(string.length < 6){
+			string = "0" + string;
+		}
+		return string;
+	}
+	var list = [];
+	try{
+		var jsondt = JSON.parse(jsond);
+	}catch(e){
+		console.log('Error: Could not parse json list!');
+		return [];
+	}
+	for(var i=0;i<jsondt.length;i++){
+		//Read each comment and generate a correct comment object
+		var data = {};
+		var xc = jsondt[i]['c'].split(',');
+		if(xc.length > 0){
+			data.stime = parseFloat(xc[0]) * 1000;
+			data.color = '#' + fillRGB(parseInt(xc[1]).toString(16));
+			data.mode = parseInt(xc[2]);
+			data.size = parseInt(xc[3]);
+			data.hash = xc[4];
+			data.date = parseInt(xc[5]);
+			data.position = "relative";
+			if(data.mode != 7){
+				data.text = jsondt[i].m.replace(/(\/n|\\n|\n|\r\n|\\r)/g,"\n");
+				data.text = data.text.replace(/\r/g,"\n");
+				data.text = data.text.replace(/\s/g,"\u00a0");
+			}else{
+				data.text = jsondt[i].m;
+			}
+			if(data.mode == 7){
+				//High level positioned dm
+				try{
+					var x = JSON.parse(data.text);
+				}catch(e){
+					console.log('[Err] Error parsing internal data for comment');
+					console.log('[Dbg] ' + data.text);
+					continue;
+				}
+				data.text = x.n; /*.replace(/\r/g,"\n");*/
+				data.text = data.text.replace(/\ /g,"\u00a0");
+				console.log(data.text);
+				if(x.p != null){
+					data.x = x.p.x / 1000; // relative position
+					data.y = x.p.y / 1000;
+				}else{
+					data.x = 0;
+					data.y = 0;
+				}
+				data.shadow = x.b;
+				data.duration = 4000;
+				if(x.l != null)
+					data.moveDelay = x.l * 1000;
+				if(x.z != null && x.z.length > 0){
+					data.movable = true;
+					data.toX = x.z[0].x / 1000;
+					data.toY = x.z[0].y / 1000;
+					data.alphaTo = x.z[0].t;
+					data.colorTo = x.z[0].c;
+					data.moveDuration = x.z[0].l != null ? (x.z[0].l * 1000) : 500;
+					data.duration = data.moveDelay + data.moveDuration;
+				}
+				if(x.r != null && x.k != null){
+					data.rX = x.r;
+					data.rY = x.k;
+				}
+				if(x.a){
+					data.alphaFrom = x.a;
+				}
+			}
+			list.push(data);
+		}
+	}
+	return list;
+}
+
+/** 
+Bilibili Format
+Licensed Under MIT License
+ Takes in an XMLDoc/LooseXMLDoc and parses that into a Generic Comment List
+**/
+function BilibiliParser(xmlDoc, text, warn){
+	function fillRGB(string){
+		while(string.length < 6){
+			string = "0" + string;
+		}
+		return string;
+	}
+	
+	//Format the bili output to be json-valid
+	function format(string){
+		return string.replace(/\t/,"\\t");	
+	}
+	if(xmlDoc !== null){
+        var elems = xmlDoc.getElementsByTagName('d');
+    }else{
+    	if(warn){
+    		if(!confirm("XML Parse Error. \n Allow tag soup parsing?\n[WARNING: This is unsafe.]")){
+    			return [];
+    		}
+    	}else{
+    		// clobber some potentially bad things
+        	text = text.replace(new RegExp("</([^d])","g"), "</disabled $1");
+        	text = text.replace(new RegExp("</(\S{2,})","g"), "</disabled $1");
+        	text = text.replace(new RegExp("<([^d/]\W*?)","g"), "<disabled $1");
+        	text = text.replace(new RegExp("<([^/ ]{2,}\W*?)","g"), "<disabled $1");
+        	console.log(text);
+    	}
+        var tmp = document.createElement("div");
+        tmp.innerHTML = text;
+        console.log(tmp);
+        var elems = tmp.getElementsByTagName('d');
+    }
+	var tlist = [];
+	for(var i=0;i<elems.length;i++){
+		if(elems[i].getAttribute('p') != null){
+			var opt = elems[i].getAttribute('p').split(',');
+			if(!elems[i].childNodes[0])
+			  continue;
+			var text = elems[i].childNodes[0].nodeValue;
+			var obj = {};
+			obj.stime = Math.round(parseFloat(opt[0]*1000));
+			obj.size = parseInt(opt[2]);
+			obj.color = "#" + fillRGB(parseInt(opt[3]).toString(16));
+			obj.mode = parseInt(opt[1]);
+			obj.date = parseInt(opt[4]);
+			obj.pool = parseInt(opt[5]);
+			obj.position = "absolute";
+			if(opt[7] != null)
+				obj.dbid = parseInt(opt[7]);
+			obj.hash = opt[6];
+			obj.border = false;
+			if(obj.mode < 7){
+				obj.text = text.replace(/(\/n|\\n|\n|\r\n)/g, "\n");
+			}else{
+				if(obj.mode == 7){
+					try{
+						adv = JSON.parse(format(text));
+						obj.shadow = true;
+						obj.x = parseInt(adv[0]);
+						obj.y = parseInt(adv[1]);
+						obj.text = adv[4].replace(/(\/n|\\n|\n|\r\n)/g, "\n");
+						obj.rZ = 0;
+						obj.rY = 0;
+						if(adv.length >= 7){
+							obj.rZ = parseInt(adv[5]);
+							obj.rY = parseInt(adv[6]);
+						}
+						obj.movable = false;
+						if(adv.length >= 11){
+							obj.movable = true;
+							obj.toX = adv[7];
+							obj.toY = adv[8];
+							obj.moveDuration = 500;
+							obj.moveDelay = 0;
+							if(adv[9]!='')
+								obj.moveDuration = adv[9];
+							if(adv[10]!="")
+								obj.moveDelay = adv[10];
+							if(adv.length > 11){
+								obj.shadow = adv[11];
+								if(obj.shadow === "true"){
+									obj.shadow = true;
+								}
+								if(obj.shadow === "false"){
+									obj.shadow = false;
+								}
+								if(adv[12]!=null)
+									obj.font = adv[12];
+							}
+						}
+						obj.duration = 2500;
+						if(adv[3] < 12){
+							obj.duration = adv[3] * 1000;
+						}
+						obj.alphaFrom = 1;
+						obj.alphaTo = 1;
+						var tmp = adv[2].split('-');
+						if(tmp != null && tmp.length>1){
+							obj.alphaFrom = parseFloat(tmp[0]);
+							obj.alphaTo = parseFloat(tmp[1]);
+						}
+					}catch(e){
+						console.log('[Err] Error occurred in JSON parsing');
+						console.log('[Dbg] ' + text);
+					}
+				}else if(obj.mode == 8){
+					obj.code = text; //Code comments are special
+				}
+			}
+			//Before we push
+			if(obj.text != null)
+				obj.text = obj.text.replace(/\u25a0/g,"\u2588");
+			tlist.push(obj);
+		}
+	}
+	return tlist;
+}
+
