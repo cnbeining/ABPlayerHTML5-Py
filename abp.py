@@ -1,6 +1,6 @@
 # coding=utf-8
 '''
-ABPlayerHTML5_Py_Mac 1.08
+ABPlayerHTML5_Py_Mac 1.08.1
 Based on ABPlayerHTML5
 MIT licence
 Beining@ACICFG
@@ -193,19 +193,17 @@ def main(video_relpath, danmu_relpath):
         danmu_relpath_json = video_relpath.split('.')[:-1][0] + '.json'
         if os.path.isfile(danmu_relpath_xml.replace('\\', '')):
             danmu_relpath = danmu_relpath_xml
-            danmaku_type = 'b'
         elif os.path.isfile(danmu_relpath_json.replace('\\', '')):
             danmu_relpath = danmu_relpath_json
-            danmaku_type = 'a'
         else:
             danmu_relpath = raw_input('Cannot find file, please drag in the danmaku file!')
-            if video_relpath.split('.')[-1].lower() is 'xml':
-                danmaku_type = 'b'
-            elif video_relpath.split('.')[-1].lower() is 'json':
-                danmaku_type = 'a'
-            else:
-                print('Cannot read danmaku!')
-                exit()
+    if 'xml' in danmu_relpath.split('.')[-1].strip().lower():
+        danmaku_type = 'b'
+    elif 'json' in danmu_relpath.split('.')[-1].strip().lower():
+        danmaku_type = 'a'
+    else:
+        print('Cannot read danmaku!')
+        exit()
         # detect the comment file by itself
     danmu_filename = danmu_relpath.split("/")[-1].strip()
     py_path = sys.path[0]
