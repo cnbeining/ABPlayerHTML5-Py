@@ -71,6 +71,8 @@ This project uses MIT licence.
 
 Update history
 -----
+.08.1: Fix cannot read danmaku in different, due to failed to do tests.
+
 .08: Add full screen support, pull update from upstream, make it possible to read JSON files. *NOT SUPPORTED FOR NOW* 
 
 .07.3:  Merge the upstream update by 02:12 EDT, Jul.1.2014. Change the scale of comment speed. 
