@@ -7,7 +7,7 @@ This is another solution of the damn fact that Mac, one of the best OS in human 
 
 Written in Python, based on ABPlayerHTML5, this is a quick way to enjoy comment(DanMu) on Mac and *nix(To-Do) like systems.
 
-Also check https://github.com/superwbd/Mukioplayer-Py-Mac  , this is the one with flash and MukioplayerPlus.
+Also check https://github.com/cnbeining/Mukioplayer-Py-Mac  , this is the one with flash and MukioplayerPlus.
 
 Download
 ------
