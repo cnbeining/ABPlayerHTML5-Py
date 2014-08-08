@@ -1,6 +1,6 @@
 # coding=utf-8
 '''
-ABPlayerHTML5_Py_Mac 1.08.1
+ABPlayerHTML5_Py_Mac 1.08.2
 Based on ABPlayerHTML5
 MIT licence
 Beining@ACICFG
@@ -9,6 +9,7 @@ cnbeining[at]gmail.com
 import thread
 import random
 import os
+from os.path import expanduser
 import getpass
 import sys
 import webbrowser
@@ -25,9 +26,9 @@ import commands
 
 
 def getrelpath(input_file):
-    '''makes this OSX only...'''
+    '''Good with all *nix.'''
     user = getpass.getuser()
-    user_dir = '/Users/' + user
+    user_dir = expanduser("~")
     os.chdir(user_dir)
     file_relpath = os.path.relpath(input_file)
     return file_relpath
@@ -173,7 +174,7 @@ def convert(v_relpath, video_dictionary, video_filename):
         '/"' +
         video_filename.split(
             '.')[
-            0] +
+                0] +
         '_MP4.mp4"')
 
 
@@ -208,8 +209,7 @@ def main(video_relpath, danmu_relpath):
     danmu_filename = danmu_relpath.split("/")[-1].strip()
     py_path = sys.path[0]
     os.chdir(py_path)
-    user = getpass.getuser()
-    user_dir = '/Users/' + user
+    user_dir = expanduser("~")
     # print(user_dir)
     try:
         os.system('mkdir '+user_dir+'/.cache/')
@@ -231,8 +231,8 @@ def main(video_relpath, danmu_relpath):
                 v_relpath,
                 video_dictionary,
                 video_filename),
-        ).start(
-        )
+            ).start(
+            )
         print(
             'I made a MP4 file for you, next time please use the MP4 file directly!')
         video_relpath = video_dictionary + '/' + \
@@ -281,7 +281,7 @@ def main(video_relpath, danmu_relpath):
 				});
 				window.abpinst = inst;
 			});
-		
+
 function launchFullscreen(element) {
   if(element.requestFullscreen) {
     element.requestFullscreen();
@@ -303,7 +303,7 @@ function exitFullscreen() {
     document.webkitExitFullscreen();
   }
 }		
-		
+
 		</script>
 	</head>
 	<body>

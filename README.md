@@ -53,7 +53,7 @@ If somehow the player failed to load, try refreshing the page, for the programme
 
 I am completely new to Python and programming, so do please help me to improve this, and I would appreciate it very much.
 
-Looking for quick way to download videos and comments from Bilibili under OSX? Try this:http://www.cnbeining.com/?s=Biligrab
+Looking for quick way to download videos and comments from Bilibili under OSX? Try this:http://www.cnbeining.com/?s=Biligrab , or https://github.com/cnbeining/Biligrab  .
 
 About me
 -----
@@ -71,6 +71,8 @@ This project uses MIT licence.
 
 Update history
 -----
+.08.2: Fix #3, use ~ as root.
+
 .08.1: Fix cannot read danmaku in different, due to failed to do tests.
 
 .08: Add full screen support, pull update from upstream, make it possible to read JSON files. *NOT SUPPORTED FOR NOW* 
