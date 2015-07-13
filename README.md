@@ -1,57 +1,53 @@
-ABPlayerHTML5-Py--nix
+ABPlayerHTML5-Py
 =====================
 
-A HTML5 solution of comment playing on *nix.
+An HTML5 solution of danmaku playing.
 
-This is another solution of the damn fact that Mac, one of the best OS in human history, does not have a reliable and nice video commit software.
+~~This is another solution of the damn fact that Mac, one of the best OS in human history, does not have a reliable and nice video commit software.~~ After 1.5 years, there are some really good options including Biligrab, BiliDan, Danmaku2ASS, etc.
 
 Written in Python, based on ABPlayerHTML5, this is a quick way to enjoy comment(DanMu) on Mac and *nix(To-Do) like systems.
 
-Also check https://github.com/cnbeining/Mukioplayer-Py-Mac  , this is the one with flash and MukioplayerPlus.
+Also check https://github.com/cnbeining/Mukioplayer-Py-Mac  , this is the one with flash and MukioplayerPlus. Probably will not have updates anymore...
 
 Download
 ------
-I will upload every version here: https://sourceforge.net/projects/abplayerhtml5pynix/
+~~I will upload every version here: https://sourceforge.net/projects/abplayerhtml5pynix/~~
 
-However, feel free to download here via the ZIP file. I just want to provide you a way to download all the old versions.
+~~However, feel free to download here via the ZIP file. I just want to provide you a way to download all the old versions.~~
 
-Also, when it comes to other *nix systems, SF would be much better than Github...
+~~Also, when it comes to other *nix systems, SF would be much better than Github...~~
+
+Since Sourceforge is abusing the community's trust, I will stop using SF. Feel free to grab the updates here.
 
 Usage
 ------
 Download all the files, extract into one folder. Personally I do not suggest you go anywhere above ‘~’, for you would meet all kinds of privilege problems, which I suppose would drive you mad.
 
-Make sure you have a web browser which can play Flash.
+Make sure you have a web browser which can play HTML5 videos: Opera does not ships with H.264 decoders, and so does Chromium and old versions of IE. I make no comments to browsers make in Chinese Mainland.
 
 Make sure you use Python 2.7 (this is provided along with OSX), and run ‘python abp.py’.
 
-After “Vid”, drag in the video file you would like to play. Since 1.02, you should can use any file with H.264 and AAC, as long as ffmpeg can convert it.
+After “Vid”, drag in the video file you would like to play. ~~Since 1.02, you should can use any file with H.264 and AAC, as long as ffmpeg can convert it.~~ After 1.5 years we should not have a lot of video that does not comes with H.264+AAC. Just make sure you are using one of the following format: MP4(H.264+AAC), WebM(VP9), or, Ogg. 
 
-For XML, drag in the XML file. Comment files from Bilibili would be OK, which had beed tested, while those from other sites are pending test. Please tell me the test result you have, this would be very helpful, and hereby I thank you in advance for your help. If the video name and the comment filename are the same, just press ENTER, and it will get the comment by itself. Enter.
+For XML, drag in the XML file. Danmaku files from Bilibili would be OK, which had beed tested, while ~~those from other sites are pending test~~ more supports depends on upstream updates.. Please tell me the test result you have, this would be very helpful, and hereby I thank you in advance for your help. If the video name and the comment filename are the same, just press ENTER, and it will get the comment by itself. Enter.
 
-For the first you run it, OSX may ask you for approving the connections. Does not matter whether you allow or not.
+OSX will ask you for approving the connections. Does not matter whether you allow or not.
 
 Now the browser would open by herself, enjoy it!
 
-After you use it, BE SURE to input Ctrl+C in the bash window! Though I have made some improvement to enhance the security, better safe than sorry.
+After you use it, BE SURE to input Ctrl+C in the bash window! Although I have made some improvement to enhance the security, better safe than sorry. 
 
 Things you should know
 -----
-Please do not include anything besides characters or numbers in your folder or filename. There ’s no guarantee that symbols would be cool.
+~~Please do not include anything besides characters or numbers in your folder or filename. There ’s no guarantee that symbols would be cool.~~ Any filename should work as long Python can takes it.
 However, since the ways that video and danmaku files are called are different between Mukioplayer-Py-Mac and this programme, some file/folder name that would work there may fail here.
-
-Only Chrome or Safari will work. Firefox or Opera on *nix cannot read MP4. No why, they just can't.
 
 Make sure you use Python 2.7, 3.3 won’t work for it doesn’t have some important network modules.
 
 This software is not made for playing anything above the folder “~”. Don’t get surprised if it gives you funny results.
 (Update: Now it should can play things regardless the original location.)
 
-If you don't have FFmpeg, copy the ffmpeg here to /usr/bin/, or the auto transcode will fail.
-
 If somehow the player failed to load, try refreshing the page, for the programme has to copy the original file first before you can visit.
-
-I am completely new to Python and programming, so do please help me to improve this, and I would appreciate it very much.
 
 Looking for quick way to download videos and comments from Bilibili under OSX? Try this:http://www.cnbeining.com/?s=Biligrab , or https://github.com/cnbeining/Biligrab  .
 
@@ -65,12 +61,24 @@ Copyleft
 -----
 A number of opensource codes are used in this little project, especially the main programme, ABPlayerHTML5. The website of ABPlayerHTML5 is https://github.com/jabbany/ABPlayerHTML5 , MIT License, used under authorization of original developer.
 
-The part of web server is from http://xiaket.org/  , author:Xia Kai <xiaket@corp.netease.com/xiaket@gmail.com> .
+As the update of ver .09.9, I am using ABPlayerHTML5-bilibili-ver as wrapper for better looks. The website of ABPlayerHTML5-bilibili-ver is https://github.com/Zhuogu/ABPlayerHTML5-bilibili-ver , MIT License.
+
+The part of web server is from http://xiaket.org/  , author:Xia Kai <xiaket@corp.netease.com/xiaket@gmail.com> . Used under authorization of original developer.
 
 This project uses MIT licence. 
 
 Update history
 -----
+.09.9: Giant update.
+- Whole rewrite: merely anything left.
+- Now using ABPlayerHTML5-bilibili-ver as wrapper.
+- Using symlink to boost the loading speed.
+- Update CCL to the latest.
+- Better deal with crazy filenames.
+- Now should works with any system: Not fully tested yet. So name changed.
+- Remove most of the hacks in original code: no more ```os.sys```
+- Remove FFMpeg: Looks useless for now. Also boost the speed.
+
 .08.2: Fix #3, use ~ as root.
 
 .08.1: Fix cannot read danmaku in different, due to failed to do tests.

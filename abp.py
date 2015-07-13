@@ -1,374 +1,146 @@
-# coding=utf-8
+#!/usr/bin/env python
+#coding:utf-8
+# Author: Beining --<cnbeining#gmail.com>
+# Purpose: An HTML5 solution of danmaku playing.
+# Created: 12/12/2013
+
+# This code includes appdirs 1.4.0
+# appdirs is under MIT license
+# https://github.com/ActiveState/appdirs
+# MIT LICENSE as in LICENSE file
+# Commit version dbf3ff1b66
+
+# This code includes httpd.py
+# Used Under License by Author
+# Author: Xia Kai --<xiaket@corp.netease.com/xiaket@gmail.com>
+# http://xiaket.org/2011/extending-simplehttpserver.html
+# Special thanks to him.
+
 '''
-ABPlayerHTML5_Py_Mac 1.08.2
-Based on ABPlayerHTML5
+ABPlayerHTML5_Py_Mac 1.09.9
+Based on ABPlayerHTML5 and ABPlayerHTML5-bilibili-ver
 MIT licence
 Beining@ACICFG
 cnbeining[at]gmail.com
 '''
-import thread
-import random
+
 import os
-from os.path import expanduser
-import getpass
+import random
+import shutil
 import sys
 import webbrowser
-from multiprocessing import Process
-import urllib
-import threading
-import shutil
-import socket
-from random import randint
-from BaseHTTPServer import HTTPServer
-from SimpleHTTPServer import SimpleHTTPRequestHandler
-import commands
 
-
-
-def getrelpath(input_file):
-    '''Good with all *nix.'''
-    user = getpass.getuser()
-    user_dir = expanduser("~")
-    os.chdir(user_dir)
-    file_relpath = os.path.relpath(input_file)
-    return file_relpath
+from appdirs import user_cache_dir
+from httpd import main2
 
 reload(sys)
 sys.setdefaultencoding('utf-8')
-# try to fix the damn code problem
-global port
-port = str(random.randint(6000, 15000))
-# or interesting things would happen...
 
-'''
-HTTP Server that supports partial, which would solve Issue #1 :
-Author:         Xia Kai <xiaket@corp.netease.com/xiaket@gmail.com>
-Filename:       httpd.py
-Type:           httpd that support resume.
-'''
+global SELF_PATH, CACHE_DIR, PORT
 
+SELF_PATH = os.path.dirname(os.path.abspath(__file__))
+CACHE_DIR = user_cache_dir('ABPlayerHTML5Py', 'cnbeining')
+PORT = random.randint(30000, 45000)
 
-class NotracebackServer(HTTPServer):
+#----------------------------------------------------------------------
+def main(video_relpath, danmaku_relpath):
+    #Get relatiive patch of video and danmaku, or find danmaku
+    (video_relpath, danmaku_relpath) = map(lambda x: x.strip().replace('\\', ''), (video_relpath, danmaku_relpath))
+    
+    video_dictionary = os.path.dirname(video_relpath)
+    
+    video_filename = os.path.basename(video_relpath)
+    (video_filename_bare, video_extension) = os.path.splitext(video_filename)
 
-    """
-    could make this a mixin, but decide to keep it simple for a simple script.
-    """
-
-    def handle_error(self, *args):
-        """override default function to disable traceback."""
-        pass
-
-
-class PartialContentHandler(SimpleHTTPRequestHandler):
-
-    def mycopy(self, f):
-        """
-        This would do the actual file tranfer. if client terminated transfer,
-        we would log it.
-        """
-        py_path = sys.path[0]
-        real_path = getrelpath(py_path)
-        os.chdir(py_path)
-        try:
-            self.copyfile(f, self.wfile)
-            self.log_message('"%s" %s', self.requestline, "req finished.")
-        except socket.error:
-            self.log_message('"%s" %s', self.requestline, "req terminated.")
-        finally:
-            f.close()
-        return None
-
-    def do_GET(self):
-        """Serve a GET request."""
-        f = self.send_head()
-        if f:
-            self.mycopy(f)
-
-    def send_head(self):
-        """
-        added support for partial content. i'm not surprised if http HEAD
-        method would fail.
-        """
-        py_path = sys.path[0]
-        real_path = getrelpath(py_path)
-        os.chdir(py_path)
-        path = self.translate_path(self.path)
-        f = None
-
-        ctype = self.guess_type(path)
-        try:
-            f = open(path, 'rb')
-        except IOError:
-            self.send_error(404, "File not found")
-            return None
-        if self.headers.get("Range"):
-            # partial content all treated here.
-            # we do not support If-Range request.
-            # range could only be of the form:
-            #   Range: bytes=9855420-
-            start = self.headers.get("Range")
-            try:
-                pos = int(start[6:-1])
-            except ValueError:
-                self.send_error(400, "bad range specified.")
-                f.close()
-                return None
-
-            self.send_response(206)
-            self.send_header("Content-type", ctype)
-            self.send_header("Connection", "keep-alive")
-            fs = os.fstat(f.fileno())
-            full = fs.st_size
-            self.send_header("Content-Length", str(fs[6] - pos))
-            self.send_header(
-                "Last-Modified",
-                self.date_time_string(fs.st_mtime))
-            start = start.replace("=", " ")
-            self.send_header(
-                "Content-Range", "%s%s/%s" %
-                (start, full - 1, full))
-            self.end_headers()
-            f.seek(pos)
-            self.mycopy(f)
-            return None
-
-        self.send_response(200)
-        self.send_header("Content-type", ctype)
-        fs = os.fstat(f.fileno())
-        self.send_header("Content-Length", str(fs[6]))
-        self.send_header("Last-Modified", self.date_time_string(fs.st_mtime))
-        self.end_headers()
-        return f
-
-
-def smain(port, server_class=NotracebackServer,
-          handler_class=PartialContentHandler):
-    # have to give you a funny name...sorry
-    py_path = sys.path[0]
-    real_path = getrelpath(py_path)
-    os.chdir(py_path)
-    server_address = ('', int(port))
-    httpd = server_class(server_address, handler_class)
-    httpd.serve_forever()
-
-
-def http_server():
-    #port = randint(20000, 50000)
-    py_path = sys.path[0]
-    real_path = getrelpath(py_path)
-    os.chdir(py_path)
-    ip = socket.gethostbyname(socket.gethostname())
-    print "serving on: http://%s:%s/" % (ip, port)
-    # used to print local files, ignore it.
-    print "===== start logging =====\n"
-    smain(port=int(port))
-
-
-def convert(v_relpath, video_dictionary, video_filename):
-    # check: http://www.cnbeining.com/?p=265
-    os.system(
-        'ffmpeg -i "' +
-        v_relpath +
-        '" -c:v copy -c:a copy ' +
-        video_dictionary +
-        '/"' +
-        video_filename.split(
-            '.')[
-                0] +
-        '_MP4.mp4"')
-
-
-def main(video_relpath, danmu_relpath):
-    #danmu_relpath = getrelpath(danmu_relpath)
-    #video_relpath = getrelpath(video_relpath)
-    output = commands.getstatusoutput('ffmpeg --help')
-    if str(output[0]) == '32512':
-        print('FFmpeg does not exist! Trying to get you a binary, need root...')
-        os.system('sudo curl -o /usr/bin/ffmpeg https://raw.githubusercontent.com/superwbd/ABPlayerHTML5-Py--nix/master/ffmpeg')
-    video_filename = video_relpath.split("/")[-1].strip()
-    video_dictionary = os.path.dirname(v_relpath)
-    danmaku_type = ''
-    if danmu_relpath is '':
-        #Add here for now.
-        danmu_relpath_xml = str(video_relpath.split('.')[:-1][0] + '.xml')
-        danmu_relpath_json = video_relpath.split('.')[:-1][0] + '.json'
-        if os.path.isfile(danmu_relpath_xml.replace('\\', '')):
-            danmu_relpath = danmu_relpath_xml
-        elif os.path.isfile(danmu_relpath_json.replace('\\', '')):
-            danmu_relpath = danmu_relpath_json
-        else:
-            danmu_relpath = raw_input('Cannot find file, please drag in the danmaku file!')
-    if 'xml' in danmu_relpath.split('.')[-1].strip().lower():
-        danmaku_type = 'b'
-    elif 'json' in danmu_relpath.split('.')[-1].strip().lower():
-        danmaku_type = 'a'
-    else:
-        print('Cannot read danmaku!')
-        exit()
-        # detect the comment file by itself
-    danmu_filename = danmu_relpath.split("/")[-1].strip()
-    py_path = sys.path[0]
-    os.chdir(py_path)
-    user_dir = expanduser("~")
-    # print(user_dir)
-    try:
-        os.system('mkdir '+user_dir+'/.cache/')
-    except:
-        pass
-    real_cache_dir = user_dir + '/.cache/abplayerhtml5_py'
-    os.system('rm -rf /' + real_cache_dir)
-    os.system('mkdir /' + real_cache_dir)
-    os.chdir(py_path)
-    os.system('rm -rf ./abpcache')
-    # clean up, then do the job
-    os.system('mkdir abpcache')
-    video_filename = video_filename.replace('\\', '')
-    if 'mp4' not in video_filename[-5:].lower():
-        print(
-            'Cannot read your file, trying to convert to MP4, need ffmpeg...')
-        Process(
-            target=convert(
-                v_relpath,
-                video_dictionary,
-                video_filename),
-            ).start(
-            )
-        print(
-            'I made a MP4 file for you, next time please use the MP4 file directly!')
-        video_relpath = video_dictionary + '/' + \
-            video_filename.split('.')[0] + '_MP4.mp4'
-        video_filename = video_filename.split('.')[0] + '_MP4.mp4'
-    print(video_relpath)
-    video_filename_url = ''
-    video_filename_url = urllib.quote(video_filename)
-    os.system('ln -s ' + real_cache_dir + ' ./abpcache ')
-    os.system('cp /' + video_relpath + '  ' + real_cache_dir)
-    if danmaku_type is 'b':
-        os.system('cp /' + danmu_relpath + '  ' + real_cache_dir + '/comment.xml')
-    elif danmaku_type is 'a':
-        os.system('cp /' + danmu_relpath + '  ' + real_cache_dir + '/comment.json')
-    # in case someone use funny filename in their file...
-    os.system(
-        'mv ' +
-        real_cache_dir +
-        '/' +
-        danmu_filename +
-        ' ' +
-        real_cache_dir +
-        '/webpage.html')
-    html_to_write = '''<!DOCTYPE html>
+    if not os.path.exists(danmaku_relpath):
+        # No Danmaku path inputed
+        for item in os.listdir(video_dictionary):
+            if item.startswith(video_filename_bare) and item.lower().endswith('.xml'):
+                danmaku_relpath = video_dictionary + "/" + item
+                break
+    
+    danmaku_filename = os.path.basename(danmaku_relpath)
+    (danmaku_filename_bare, danmaku_extension) = os.path.splitext(danmaku_filename)
+    
+    # Prepare the cache dir
+    if os.path.exists(CACHE_DIR):  #Force clean the cache
+        os.unlink(CACHE_DIR)  # rmtree cannot be used on symlink
+    
+    local_cache_dir = SELF_PATH + '/cache'  # httpd.py can only run on its own path
+    
+    if os.path.exists(local_cache_dir):
+        shutil.rmtree(local_cache_dir)
+    os.makedirs(local_cache_dir)
+    
+    video_extension_strip = video_extension[1:].lower()
+    
+    
+    # Prepare the webpage
+    # TODO: Find a better way to format multiline string like this
+    a = """<!DOCTYPE html>
 <html>
-	<head>
-		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-		<meta http-equiv="X-UA-Compatible" value="IE=9">
-		<link rel="stylesheet" href="css/base.css?1" />
-		<title>''' + video_filename + ''' - ABPlayerHTML5PyMac</title>
-		<script src="mobile.js"></script>
-		<script src="CommentCoreLibrary.js"></script>
-		<script src="libxml.js"></script>
-		<script src="Parsers.js"></script>
-		<script src="player.js"></script>
-		<script type="text/javascript">
-			window.addEventListener("load",function(){
-				var inst = ABP.bind(document.getElementById("player1"), isMobile());
-				CommentLoader("comment.xml", inst.cmManager);
-				inst.txtText.focus();
-				inst.txtText.addEventListener("keydown", function(e){
-					if(e && e.keyCode === 13){
-						if(/^!/.test(this.value)) return; //Leave the internal commands
-						inst.txtText.value = "";
-					}
-				});
-				window.abpinst = inst;
-			});
-
-function launchFullscreen(element) {
-  if(element.requestFullscreen) {
-    element.requestFullscreen();
-  } else if(element.mozRequestFullScreen) {
-    element.mozRequestFullScreen();
-  } else if(element.webkitRequestFullscreen) {
-    element.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
-  } else if(element.msRequestFullscreen) {
-    element.msRequestFullscreen();
-  }
-}
-
-function exitFullscreen() {
-  if(document.exitFullscreen) {
-    document.exitFullscreen();
-  } else if(document.mozCancelFullScreen) {
-    document.mozCancelFullScreen();
-  } else if(document.webkitExitFullscreen) {
-    document.webkitExitFullscreen();
-  }
-}		
-
-		</script>
-	</head>
-	<body>
-		<div id="player1" class="ABP-Unit ABP-FullScreen" style="width:1440px;height:900px;" tabindex="1">
-			<div class="ABP-Video">
-				<div class="ABP-Container"></div>
-				<video id="abp-video" autobuffer="true" data-setup="{}">
-					<source src="http://localhost:''' + port + '''/abpcache/abplayerhtml5_py/''' + video_filename_url + '''" type="video/mp4">
-					<p>Your browser does not support html5 video!</p>
-				</video>
-			</div>
-			<div class="ABP-Control">
-				<div class="button ABP-Play"></div>
-				<div class="progress-bar">
-					<div class="bar dark"></div>
-					<div class="bar"></div>
-				</div>
-				<div class="button ABP-CommentShow"></div>
-				<div class="button ABP-FullScreen"></div>
-			</div>
-		</div>
-	</body>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <link rel="stylesheet" href="css/base.css" />
+        <link rel="stylesheet" href="css/colpick.css" />
+        <title>ABPlayerHTML5Py</title>
+        <script src="js/jquery.min.js"></script>
+        <script src="js/CommentCoreLibrary.min.js"></script>
+        <script src="js/ABPMobile.js"></script>
+        <script src="js/ABPLibxml.js"></script>
+        <script src="js/ABPlayer.js"></script>
+        <script src="js/ColPick.js"></script>
+        <script type="text/javascript">
+            window.addEventListener("load",function(){
+                var inst = ABP.create(document.getElementById("player1"), {
+                    src: {
+                        playlist: [{
+                            video: document.getElementById("video-1"),
+                            comments: "/cache/comment.xml"
+                        }]
+                    },
+                    width: "95%",//magic number
+                    height: 960,
+                    mobile: isMobile()
+                });
+                window.abpinst = inst;
+            });
+        </script>
+    </head>
+    <body>
+        <div id="player1">
+            <video id="video-1" autobuffer="true" data-setup="{}">
+                <source src="http://127.0.0.1:""" + str(PORT) + """/cache/video""" +video_extension + """\" type="video/""" + video_extension_strip + """">
+                <p>Your browser does not support html5 video!</p>
+            </video>
+        </div>
+    </body>
 </html>
-'''
-    html_to_write = html_to_write.encode("utf8")
-    os.chdir(py_path)
-    f = open('./webpage.html', "w")
-    f.write(html_to_write)
+"""
+    f = open(SELF_PATH + '/webpage.html', 'w')
+    a = str(a.encode("utf8"))
+    f.write(a)
     f.close()
-    Process(target=http_server, ).start()
-    os.chdir(py_path)
-    os.system('cp -R ./*  ' + real_cache_dir + '/')
-    webbrowser.open(
-        'http://localhost:' +
-        port +
-        '/abpcache/abplayerhtml5_py/webpage.html')
-#.get('safari')
-'''Edit here to use your prefered browser!
-    'mozilla' Mozilla('mozilla')   
-    'firefox' Mozilla('mozilla')   
-    'netscape' Mozilla('netscape')   
-    'galeon' Galeon('galeon')   
-    'epiphany' Galeon('epiphany')   
-    'skipstone' BackgroundBrowser('skipstone')   
-    'kfmclient' Konqueror() (1) 
-    'konqueror' Konqueror() (1) 
-    'kfm' Konqueror() (1) 
-    'mosaic' BackgroundBrowser('mosaic')   
-    'opera' Opera()   
-    'grail' Grail()   
-    'links' GenericBrowser('links')   
-    'elinks' Elinks('elinks')   
-    'lynx' GenericBrowser('lynx')   
-    'w3m' GenericBrowser('w3m')   
-    'windows-default' WindowsDefault (2) 
-    'macosx' MacOSX('default') (3) 
-    'safari' MacOSX('safari') (3) 
-    'google-chrome' Chrome('google-chrome')   
-    'chrome' Chrome('chrome')   
-    'chromium' Chromium('chromium')   
-    'chromium-browser' Chromium('chromium-browser')'''
+    
+    
+    
+    # Time to put our stuff in the cache dir!
+    os.symlink(danmaku_relpath, local_cache_dir + '/comment.xml')
+    os.symlink(video_relpath, local_cache_dir + '/video' + video_extension)
+    os.symlink(SELF_PATH + '/css', local_cache_dir + '/css')
+    os.symlink(SELF_PATH + '/js', local_cache_dir + '/js')
+    os.symlink(SELF_PATH + '/webpage.html', local_cache_dir + '/webpage.html')
+    os.symlink(SELF_PATH + '/favicon.ico', local_cache_dir + '/favicon.ico')
+    # Connect to remote cache dir
+    os.symlink(local_cache_dir, CACHE_DIR)
+    webbrowser.open('http://127.0.0.1:' + str(PORT) + '/cache/webpage.html')
+    # Start HTTP server now
+    main2(PORT, CACHE_DIR)
+
+
 
 v_relpath = raw_input('Vid')
-#v_relpath = v_relpath.encode('utf-8')
 X_relpath = raw_input('XML')
-#X_relpath = X_relpath.encode('utf-8')
-
 main(v_relpath, X_relpath)
+
+
