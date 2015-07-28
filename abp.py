@@ -17,7 +17,7 @@
 # Special thanks to him.
 
 '''
-ABPlayerHTML5_Py_Mac 1.09.9
+ABPlayerHTML5_Py_Mac 1.09.91
 Based on ABPlayerHTML5 and ABPlayerHTML5-bilibili-ver
 MIT licence
 Beining@ACICFG
@@ -41,6 +41,7 @@ global SELF_PATH, CACHE_DIR, PORT
 SELF_PATH = os.path.dirname(os.path.abspath(__file__))
 CACHE_DIR = user_cache_dir('ABPlayerHTML5Py', 'cnbeining')
 PORT = random.randint(30000, 45000)
+
 
 #----------------------------------------------------------------------
 def main(video_relpath, danmaku_relpath):
@@ -136,6 +137,7 @@ def main(video_relpath, danmaku_relpath):
     webbrowser.open('http://127.0.0.1:' + str(PORT) + '/cache/webpage.html')
     # Start HTTP server now
     main2(PORT, CACHE_DIR)
+    os._exit(0)
 
 
 

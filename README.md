@@ -1,4 +1,4 @@
-ABPlayerHTML5-Py
+ABPlayerHTML5-Py & ABPlayerHTML5-Py-Live
 =====================
 
 An HTML5 solution of danmaku playing.
@@ -8,6 +8,8 @@ An HTML5 solution of danmaku playing.
 Written in Python, based on ABPlayerHTML5, this is a quick way to enjoy comment(DanMu) on Mac and *nix(To-Do) like systems.
 
 Also check https://github.com/cnbeining/Mukioplayer-Py-Mac  , this is the one with flash and MukioplayerPlus. Probably will not have updates anymore...
+
+Now with live mode! Supports http://live.bilibili.com !
 
 Download
 ------
@@ -19,7 +21,7 @@ Download
 
 Since Sourceforge is abusing the community's trust, I will stop using SF. Feel free to grab the updates here.
 
-Usage
+Usage of normal version
 ------
 Download all the files, extract into one folder. Personally I do not suggest you go anywhere above ‘~’, for you would meet all kinds of privilege problems, which I suppose would drive you mad.
 
@@ -36,6 +38,16 @@ OSX will ask you for approving the connections. Does not matter whether you allo
 Now the browser would open by herself, enjoy it!
 
 After you use it, BE SURE to input Ctrl+C in the bash window! Although I have made some improvement to enhance the security, better safe than sorry. 
+
+Usage of Live version
+------
+live.py:
+
+Simplely insert the cid of the room.
+
+You may need to refresh the browser to make it running.
+
+DO NOT FORGET TO PRESS CTRL+C AFTER USAGE, FOR THIS SCRIPT WILL KEEP CACHING CONTENTS UNTIL YOUR HARD DRIVE BLOWS UP! 
 
 Things you should know
 -----
@@ -61,14 +73,21 @@ Copyleft
 -----
 A number of opensource codes are used in this little project, especially the main programme, ABPlayerHTML5. The website of ABPlayerHTML5 is https://github.com/jabbany/ABPlayerHTML5 , MIT License, used under authorization of original developer.
 
-As the update of ver .09.9, I am using ABPlayerHTML5-bilibili-ver as wrapper for better looks. The website of ABPlayerHTML5-bilibili-ver is https://github.com/Zhuogu/ABPlayerHTML5-bilibili-ver , MIT License.
+As the update of ver .09.9, I am using ABPlayerHTML5-bilibili-ver as wrapper for better looks. The website of ABPlayerHTML5-bilibili-ver is https://github.com/Zhuogu/ABPlayerHTML5-bilibili-ver , MIT License, used under authorization of original developer.
 
 The part of web server is from http://xiaket.org/  , author:Xia Kai <xiaket@corp.netease.com/xiaket@gmail.com> . Used under authorization of original developer.
+
+Special thanks to @TYPCN.
 
 This project uses MIT licence. 
 
 Update history
 -----
+
+Live .01: First version.
+
+.09.91: HTTP server enhance, much quicker loadtime - now the only limit is your own browser.
+
 .09.9: Giant update.
 - Whole rewrite: merely anything left.
 - Now using ABPlayerHTML5-bilibili-ver as wrapper.

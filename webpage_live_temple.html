@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <link rel="stylesheet" href="css/base.css" />
+        <link rel="stylesheet" href="css/colpick.css" />
+        <title>ABPlayerHTML5Py</title>
+        <script src="js/jquery.min.js"></script>
+        <script src="js/CommentCoreLibrary.min.js"></script>
+        <script src="js/ABPMobile.js"></script>
+        <script src="js/ABPLibxml.js"></script>
+        <script src="js/ABPlayer.js"></script>
+        <script src="js/ColPick.js"></script>
+        <script src="js/hls.js"></script>
+
+        <script type="text/javascript">
+            window.addEventListener("load",function(){
+                var inst = ABP.create(document.getElementById("player1"), {
+                    src: {
+                        playlist: [{
+                            video: document.getElementById("video-1"),
+                            comments: ""
+                        }]
+                    },
+                    width: "95%",//magic number
+                    height: 960,
+                    mobile: isMobile()
+                });
+                window.abpinst = inst;
+            });
+        </script>
+    </head>
+    <body>
+        <div id="player1">
+            <video id="video-1" autobuffer="true" data-setup="{}">
+                <p>Your browser does not support html5 video!</p>
+            </video>
+        </div>
+        <script>
+        window.hls = new Hls({debug:true});
+        hls.loadSource("http://127.0.0.1:$PORT/cache/out.m3u8");
+        hls.attachVideo(document.getElementById("video-1"));
+        </script>
+        <script>
+        var wsurl = 'ws://livecmt.bilibili.com:88/$cid';
+        function getws(wsurl)
+        {
+        // Create a socket instance
+        var socket = new WebSocket(wsurl);
+
+        // Open the socket
+        socket.onopen = function(event) {
+	
+        	// Listen for messages
+        	socket.onmessage = function (event) { 
+                var a = JSON.parse(event.data.slice(4));
+                console.log('Received:',a);
+                abpinst.cmManager.sendComment({
+                					"text": a["info"][1],
+                					"mode": a["info"][0][1],
+                					"stime": abpinst.video.currentTime,
+                					"size": a["info"][0][2],
+                					"color": a["info"][0][3],
+                					"border": false
+                				});
+            }
+	
+        	// Listen for socket closes
+        	socket.onclose = function(event) {
+        		console.log('WS closed, starting new one',event);
+                getws(wsurl); //serve forever and ever and ever
+        	};
+            };
+        };
+        getws(wsurl);
+        </script>
+    </body>
+</html>

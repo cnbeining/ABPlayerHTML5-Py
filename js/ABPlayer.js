@@ -262,7 +262,7 @@ var ABP = {
 		var danmaku = [];
 		if (typeof params.src === "string") {
 			params.src = _("video", {
-				"autobuffer": "true",
+				"autobuffer": "false",
 				"dataSetup": "{}",
 			}, [
 				_("source", {
@@ -283,7 +283,7 @@ var ABP = {
 						}));
 					}
 					playlist.push(_("video", {
-						"autobuffer": "true",
+						"autobuffer": "false",
 						"dataSetup": "{}",
 					}, sources));
 				} else if (plist[id].hasOwnProperty("video")) {

@@ -12,12 +12,18 @@ import os
 import socket
 import sys
 
+from SocketServer import ThreadingMixIn
 from random import randint
 from BaseHTTPServer import HTTPServer
 from SimpleHTTPServer import SimpleHTTPRequestHandler
+import urllib2
+import StringIO
+import binascii
+import urllib
+import atexit
 
 
-class NotracebackServer(HTTPServer):
+class NotracebackServer(ThreadingMixIn, HTTPServer):
     """
     could make this a mixin, but decide to keep it simple for a simple script.
     """
@@ -43,15 +49,42 @@ class PartialContentHandler(SimpleHTTPRequestHandler):
 
     def do_GET(self):
         """Serve a GET request."""
+        #print('PATH:' + self.path)
+        if self.path.startswith('/__proxy__/'):  #Reverse proxy this
+            #print()
+            url = self.path[11:]
+            print(url)
+            #request = urllib2.Request(url)
+            #response = urllib2.urlopen(request)
+            #print(response.code)
+            #self.send_response(response.code)
+            response = response_copy = urllib.urlopen(url)
+            response_code = response.code
+            self.send_response(response.code)
+            response_headers = response.headers
+            [self.send_header(i, response_headers[i]) for i in response_headers]
+            #print(self.headers['Origin'])
+            try:
+                self.send_header('Access-Control-Allow-Origin', self.headers['Origin'])
+            except:
+                self.send_header('Access-Control-Allow-Origin', '*')
+            self.send_header('Access-Control-Allow-Credentials', 'true')
+            #print(dict(self.response_headers))
+            #print('HERE!')
+            self.end_headers()
+            self.copyfile(response, self.wfile)
+            return None
         f = self.send_head()
         if f:
             self.mycopy(f)
+
 
     def send_head(self):
         """
         added support for partial content. i'm not surprised if http HEAD
         method would fail.
         """
+        
         path = self.translate_path(self.path)
         f = None
         if os.path.isdir(path):
@@ -103,39 +136,52 @@ class PartialContentHandler(SimpleHTTPRequestHandler):
 
 def main(port, server_class=NotracebackServer,
         handler_class=PartialContentHandler):
+    os.setpgrp()
     server_address = ('', port)
     httpd = server_class(server_address, handler_class)
-    httpd.serve_forever()
+    #httpd.serve_forever()
+    try:  # Handle connections at the same time, so loading will not fail
+        while 1:
+            httpd.handle_request()
+    except Exception:
+        print "Finished"
+        os.killpg(os.getpid(), signal.SIGTERM)
+        os._exit(0)
+    os._exit(0)
 
 #----------------------------------------------------------------------
 def main2(port, folder):
     """"""
+    
+    sys.stdout.flush()
     print(folder)
     ip = '127.0.0.1'
-    print "serving on: http://%s:%s/" % (ip, port)
-    print "===== local files ====="
+    print("serving on: http://%s:%s/" % (ip, port))
+    print("===== local files =====")
     cwd = folder
     for f in os.listdir(cwd):
         if f == sys.argv[0] or f.startswith("."):
             continue
         fullpath = os.path.join(cwd, f)
         if os.path.isfile(fullpath):
-            print "link: http://%s:%s/%s" % (ip, port, f)
-    print "===== start logging =====\n"
+            print("link: http://%s:%s/%s" % (ip, port, f))
+    print("===== start logging =====\n")
     main(port=port)
+    os.killpg(os.getpid(), signal.SIGTERM)
+    
 
-#if __name__ == "__main__":
-    #port = randint(20000, 50000)
-    ##ip = socket.gethostbyname(socket.gethostname())
-    #ip = '127.0.0.1'
-    #print "serving on: http://%s:%s/" % (ip, port)
-    #print "===== local files ====="
-    #cwd = os.getcwd()
-    #for f in os.listdir(cwd):
-        #if f == sys.argv[0] or f.startswith("."):
-            #continue
-        #fullpath = os.path.join(cwd, f)
-        #if os.path.isfile(fullpath):
-            #print "link: http://%s:%s/%s" % (ip, port, f)
-    #print "===== start logging =====\n"
-    #main(port=port)
+if __name__ == "__main__":
+    port = 30000
+    #ip = socket.gethostbyname(socket.gethostname())
+    ip = '127.0.0.1'
+    print("serving on: http://%s:%s/" % (ip, port))
+    print("===== local files =====")
+    cwd = os.getcwd()
+    for f in os.listdir(cwd):
+        if f == sys.argv[0] or f.startswith("."):
+            continue
+        fullpath = os.path.join(cwd, f)
+        if os.path.isfile(fullpath):
+            print("link: http://%s:%s/%s" % (ip, port, f))
+    print("===== start logging =====\n")
+    main(port=port)
